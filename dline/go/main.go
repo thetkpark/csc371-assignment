@@ -103,7 +103,14 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 }
 
 func printMessage(msg BroadcastMessage, num int) {
-	fmt.Printf("Process %d: Time %v, Sequence number %d, type %s, %s\n", num, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
+	color := "\033[31m"
+	switch num {
+	case 1:
+		color = "\033[33m"
+	case 2:
+		color = "\033[34m"
+	}
+	fmt.Printf("\n%sProcess %d: Time %v, Sequence number %d, type %s, %s", color, num, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
 }
 
 func sendBroadcastMessage(c chan<- BroadcastMessage, msg BroadcastMessage) {
