@@ -28,14 +28,15 @@ func main() {
 	broadcastChan := make([]chan BroadcastMessage, n)
 	msgChan := make(chan IncomingMessage)
 
-	// Spawn sequencer in another goroutine
 	for i:=0; i<n; i++ {
 		// Spawn user/process
 		broadcastChan[i] = make(chan BroadcastMessage)
 		go process(broadcastChan[i], i+1)
 	}
+	// Spawn sequencer in another goroutine
 	go sequencer(msgChan, broadcastChan)
 
+	// To receive input from user
 	for {
 		var msgTypeInput, msgType string
 		textMsg := ""
