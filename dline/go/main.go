@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -23,10 +24,19 @@ type IncomingMessage struct {
 	messageType string
 }
 
+type MessagesQueue struct {
+	incomingMessage IncomingMessage
+	waitDuration time.Duration
+	timestamp time.Time
+}
+
+var wg sync.WaitGroup
+
 func main() {
 	n := 3
 	broadcastChan := make([]chan BroadcastMessage, n)
 	msgChan := make(chan IncomingMessage)
+	var messages []MessagesQueue
 
 	for i:=0; i<n; i++ {
 		// Spawn user/process
@@ -36,13 +46,17 @@ func main() {
 	// Spawn sequencer in another goroutine
 	go sequencer(msgChan, broadcastChan)
 
+	fmt.Println("This is a visualization of how d-line would deal with messages that are not received in order")
+	fmt.Println("Please enter the messages that will be used in simulation. Note that the interval of each message is the interval that you submit the message")
 	// To receive input from user
 	for {
-		var msgTypeInput, msgType string
-		textMsg := ""
-
-		fmt.Printf("\nPlease choose message type (Text, Image, Video): ")
+		var msgTypeInput, msgType, textMsg string
+		fmt.Printf("\nPlease choose message type (Text, Image, Video) or 'End' to stop: ")
 		fmt.Scanf("%s",&msgTypeInput)
+		if strings.ToLower(msgTypeInput) == "end" {
+			fmt.Printf("Your messages is saved and the visualization will start now...")
+			break
+		}
 		switch strings.ToLower(msgTypeInput) {
 		case Text:
 			msgType = Text
@@ -55,8 +69,27 @@ func main() {
 			fmt.Printf("Please enter video title: ")
 		}
 		fmt.Scanf("%s", &textMsg)
-		msgChan <- IncomingMessage{messageType: msgType, message: textMsg}
+
+		var waitDuration int64
+		if len(messages) != 0 {
+			waitDuration = time.Now().UnixNano() - messages[len(messages)-1].timestamp.UnixNano()
+		}
+		messages = append(messages, MessagesQueue{
+			incomingMessage: IncomingMessage{
+				message:     textMsg,
+				messageType: msgType,
+			},
+			waitDuration: time.Duration(waitDuration),
+			timestamp:    time.Now(),
+		})
 	}
+
+	for _, message := range messages {
+		wg.Add(n)
+		time.Sleep(message.waitDuration)
+		msgChan <- message.incomingMessage
+	}
+	wg.Wait()
 }
 
 
@@ -111,6 +144,7 @@ func printMessage(msg BroadcastMessage, num int) {
 		color = "\033[34m"
 	}
 	fmt.Printf("\n%sProcess %d: Time %v, Sequence number %d, type %s, %s", color, num, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
+	wg.Done()
 }
 
 func sendBroadcastMessage(c chan<- BroadcastMessage, msg BroadcastMessage) {
