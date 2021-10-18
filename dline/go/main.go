@@ -85,7 +85,7 @@ func main() {
 	for i:=0; i<n; i++ {
 		// Spawn user/process
 		broadcastChan[i] = make(chan BroadcastMessage)
-		processOutHeader := pterm.DefaultSection.WithLevel(i+1).Sprintln("Process ", i+1)
+		processOutHeader := pterm.DefaultSection.WithLevel(i+1).Sprintln("User ", i+1)
 		outputs[i] = processOutHeader
 		go process(broadcastChan[i], i, area)
 	}
@@ -145,7 +145,7 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 
 func printMessage(msg BroadcastMessage, num int, area *pterm.AreaPrinter) {
 	m.Lock()
-	txt := pterm.Info.Sprintf("Process %d: Time %v, Sequence number %d, type %s, %s\n", num+1, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
+	txt := pterm.Info.Sprintf("Process %d: Time %v, Seq %d, type %s, %s\n", num+1, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
 	outputs[num] += txt
 	totalOutText := ""
 	for _, output := range outputs {
