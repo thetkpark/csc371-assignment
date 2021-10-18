@@ -8,6 +8,26 @@ import (
 	"time"
 )
 
+// BroadcastMessage defined the data structure that the sequencer sent to each user/process
+type BroadcastMessage struct {
+	seq uint
+	message string
+	messageType string
+}
+// IncomingMessage represent the message from the user received via console that later will be sent to sequencer
+type IncomingMessage struct {
+	message string
+	messageType string
+}
+// MessagesQueue defined the data structure of the recorded input message from the user via console input.
+// It will be used later when the user stop typing the input message.
+type MessagesQueue struct {
+	incomingMessage IncomingMessage
+	waitDuration time.Duration
+	timestamp time.Time
+}
+
+// Defined the constants
 const(
 	Text string = "text"
 	Image string = "image"
@@ -15,36 +35,27 @@ const(
 	n int = 3
 )
 
-type BroadcastMessage struct {
-	seq uint
-	message string
-	messageType string
-}
-
-type IncomingMessage struct {
-	message string
-	messageType string
-}
-
-type MessagesQueue struct {
-	incomingMessage IncomingMessage
-	waitDuration time.Duration
-	timestamp time.Time
-}
-
+// WaitGroup is used to stop the main goroutine to exiting early and wait for all process/user and sequencer to get their works done.
 var wg sync.WaitGroup
+// Mutex is used to prevent two goroutine to enter critical section at the same time. Also helped to display the output that not overlap.
 var m sync.Mutex
+// outputs is used to store all the output in string. It will be later render by Ptem library to update the text area.
 var outputs []string
 
+// Main is the main goroutine and responsible for spawn other goroutine and get input from the user
 func main() {
-	outputs = make([]string, n)
-	broadcastChan := make([]chan BroadcastMessage, n)
-	msgChan := make(chan IncomingMessage)
+	outputs = make([]string, n) // create slides of outputs that for each user/process
+	broadcastChan := make([]chan BroadcastMessage, n) // create n number of channel for communication between sequencer and each user/process
+	msgChan := make(chan IncomingMessage) // create a channel of communication for main goroutine to send message to sequencer in another goroutine
 	var messages []MessagesQueue
 
-	fmt.Println("This is a visualization of how d-line would deal with messages that are not received in order")
-	fmt.Println("Please enter the messages that will be used in simulation. Note that the interval of each message is the interval that you submit the message")
-	// To receive input from user
+	pterm.PrintDebugMessages = true
+	bt, _ := pterm.DefaultBigText.WithLetters(pterm.NewLettersFromString("D-LINE")).Srender()
+	pterm.DefaultCenter.Print(bt)
+	pterm.DefaultCenter.WithCenterEachLineSeparately().Println(`This is a visualization of how D-LINE would deal with messages that are not received in order
+Please enter the messages that will be used in simulation. 
+Note that time that each messages are sent to sequencer is time you used before submit another message`)
+	// Receive input from user
 	for {
 		var msgTypeInput, msgType, textMsg string
 		fmt.Printf("\nPlease choose message type (Text, Image, Video) or 'End' to stop: ")
@@ -79,6 +90,13 @@ func main() {
 			timestamp:    time.Now(),
 		})
 	}
+	// Print out all the messages
+	for i, msg := range messages {
+		pterm.DefaultCenter.Printf("\nType %s, %s", msg.incomingMessage.messageType, msg.incomingMessage.message)
+		if i < len(messages) - 1 {
+			pterm.DefaultCenter.Printf("\n|\n| %v seconds\n∨", messages[i+1].waitDuration.Round(time.Second).Seconds())
+		}
+	}
 
 	area, _ := pterm.DefaultArea.Start()
 
@@ -110,17 +128,20 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 		msg := <- in
 		// If it's a expected message -> print it out
 		if localSeq + 1 == msg.seq {
-			printMessage(msg, num, area)
+			printMessage(pterm.Info.Sprintf("DISPLAY Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			localSeq++
+			wg.Done()
 
 			// Look at the buffer to see if there is next message
 			for len(buffer) > 0 && localSeq + 1 == buffer[0].seq {
-				printMessage(buffer[0], num, area)
+				printMessage(pterm.Info.Sprintf("DISPLAY FROM BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
 				localSeq++
+				wg.Done()
 			}
 		} else {
 			// Not the expected message -> put in buffer
+			printMessage(pterm.Debug.Sprintf("ADD TO BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			buffer = append(buffer, msg)
 		}
 	}
@@ -142,16 +163,14 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 	}
 }
 
-func printMessage(msg BroadcastMessage, num int, area *pterm.AreaPrinter) {
+func printMessage(msg string, num int, area *pterm.AreaPrinter) {
 	m.Lock()
-	txt := pterm.Info.Sprintf("Process %d: Time %v, Seq %d, type %s, %s\n", num+1, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
-	outputs[num] += txt
-	area.Update(getAllSectionString())
+	outputs[num] += msg
+	area.Update(getAllSectionOutputString())
 	m.Unlock()
-	wg.Done()
 }
 
-func getAllSectionString() string {
+func getAllSectionOutputString() string {
 	totalOutText := ""
 	for _, output := range outputs {
 		totalOutText += output
