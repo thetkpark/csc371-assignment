@@ -85,8 +85,7 @@ func main() {
 	for i:=0; i<n; i++ {
 		// Spawn user/process
 		broadcastChan[i] = make(chan BroadcastMessage)
-		processOutHeader := pterm.DefaultSection.WithLevel(i+1).Sprintln("User ", i+1)
-		outputs[i] = processOutHeader
+		outputs[i] = pterm.DefaultSection.WithLevel(i+1).Sprintln("User ", i+1)
 		go process(broadcastChan[i], i, area)
 	}
 	// Spawn sequencer in another goroutine
@@ -147,14 +146,17 @@ func printMessage(msg BroadcastMessage, num int, area *pterm.AreaPrinter) {
 	m.Lock()
 	txt := pterm.Info.Sprintf("Process %d: Time %v, Seq %d, type %s, %s\n", num+1, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
 	outputs[num] += txt
+	area.Update(getAllSectionString())
+	m.Unlock()
+	wg.Done()
+}
+
+func getAllSectionString() string {
 	totalOutText := ""
 	for _, output := range outputs {
 		totalOutText += output
 	}
-	area.Update(totalOutText)
-	//fmt.Printf("\n%sProcess %d: Time %v, Sequence number %d, type %s, %s", color, num, time.Now().Unix(), msg.seq, msg.messageType, msg.message)
-	m.Unlock()
-	wg.Done()
+	return totalOutText
 }
 
 func sendBroadcastMessage(c chan<- BroadcastMessage, msg BroadcastMessage) {
