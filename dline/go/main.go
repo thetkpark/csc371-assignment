@@ -46,7 +46,9 @@ var outputs []string
 
 // Main is the main goroutine and responsible for spawn other goroutine and get input from the user
 func main() {
-	outputs = make([]string, n) // create slides of outputs that for each user/process
+	outputs = make([]string, n+2) // create slides of outputs that for each user/process + main thread and sequencer
+	outputs[0] = pterm.DefaultSection.WithLevel(1).Sprintln("Main")
+	outputs[1] = pterm.DefaultSection.WithLevel(2).Sprintln("Sequencer")
 	broadcastChan := make([]chan BroadcastMessage, n) // create n number of channel for communication between sequencer and each user/process
 	msgChan := make(chan IncomingMessage) // create a channel of communication for main goroutine to send message to sequencer in another goroutine
 	var messages []MessagesQueue
@@ -113,8 +115,8 @@ Note that time that each messages are sent to sequencer is time you used before 
 	for i:=0; i<n; i++ {
 		// Spawn user/process
 		broadcastChan[i] = make(chan BroadcastMessage)
-		outputs[i] = pterm.DefaultSection.WithLevel(i+1).Sprintln("User ", i+1)
-		go process(broadcastChan[i], i, area)
+		outputs[i+2] = pterm.DefaultSection.WithLevel(i+1+2).Sprintln("User ", i+1)
+		go process(broadcastChan[i], i+2, area)
 	}
 	// Spawn sequencer in another goroutine
 	go sequencer(msgChan, broadcastChan)
@@ -124,6 +126,7 @@ Note that time that each messages are sent to sequencer is time you used before 
 		wg.Add(n)
 		time.Sleep(message.waitDuration)
 		msgChan <- message.incomingMessage
+		printMessage(pterm.Success.Sprintfln("SENT MESSAGE, Time %v, Type %s, %s", time.Now().Unix(), message.incomingMessage.messageType, message.incomingMessage.message), 0, area)
 	}
 	wg.Wait() // Wait for all goroutine to finish before exit
 }
