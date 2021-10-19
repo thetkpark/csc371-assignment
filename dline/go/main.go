@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/pterm/pterm"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -62,7 +63,6 @@ Note that time that each messages are sent to sequencer is time you used before 
 		fmt.Printf("\nPlease choose message type (Text, Image, Video) or 'End' to stop: ")
 		fmt.Scanf("%s",&msgTypeInput)
 		if strings.ToLower(msgTypeInput) == "end" {
-			fmt.Printf("Your messages is saved and the visualization will start now...")
 			break
 		}
 		switch strings.ToLower(msgTypeInput) {
@@ -98,9 +98,18 @@ Note that time that each messages are sent to sequencer is time you used before 
 			pterm.DefaultCenter.Printf("\n|\n| %v seconds\n∨", messages[i+1].waitDuration.Round(time.Second).Seconds())
 		}
 	}
+	var isContinue string
+	fmt.Print("Your messages will be sent to sequencer in the order as shown above. Continue? [Y]es, [N]o: ")
+	fmt.Scanf("%s", &isContinue)
+	switch strings.ToLower(isContinue) {
+	case "y":
+	case "yes":
+	default:
+		os.Exit(0)
+	}
+	fmt.Println("The visualization will start now...")
 
 	area, _ := pterm.DefaultArea.Start()
-
 	for i:=0; i<n; i++ {
 		// Spawn user/process
 		broadcastChan[i] = make(chan BroadcastMessage)
@@ -110,12 +119,13 @@ Note that time that each messages are sent to sequencer is time you used before 
 	// Spawn sequencer in another goroutine
 	go sequencer(msgChan, broadcastChan)
 
+	// Sending message to sequencer with time delay
 	for _, message := range messages {
 		wg.Add(n)
 		time.Sleep(message.waitDuration)
 		msgChan <- message.incomingMessage
 	}
-	wg.Wait()
+	wg.Wait() // Wait for all goroutine to finish before exit
 }
 
 
@@ -129,13 +139,13 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 		msg := <- in
 		// If it's a expected message -> print it out
 		if localSeq + 1 == msg.seq {
-			printMessage(pterm.Info.Sprintf("DISPLAY Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
+			printMessage(pterm.Info.Sprintf("DISPLAY, Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			localSeq++
 			wg.Done()
 
 			// Look at the buffer to see if there is next message
 			for len(buffer) > 0 && localSeq + 1 == buffer[0].seq {
-				printMessage(pterm.Info.Sprintf("DISPLAY FROM BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
+				printMessage(pterm.Info.Sprintf("DISPLAY FROM BUFFER, Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
 				sortBufferMessages(buffer)
 				localSeq++
@@ -143,7 +153,7 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 			}
 		} else {
 			// Not the expected message -> put in buffer
-			printMessage(pterm.Debug.Sprintf("ADD TO BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
+			printMessage(pterm.Debug.Sprintf("ADD TO BUFFER, Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			buffer = append(buffer, msg)
 			sortBufferMessages(buffer)
 		}
