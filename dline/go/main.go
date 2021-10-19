@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/pterm/pterm"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -136,6 +137,7 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 			for len(buffer) > 0 && localSeq + 1 == buffer[0].seq {
 				printMessage(pterm.Info.Sprintf("DISPLAY FROM BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
+				sortBufferMessages(buffer)
 				localSeq++
 				wg.Done()
 			}
@@ -143,6 +145,7 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 			// Not the expected message -> put in buffer
 			printMessage(pterm.Debug.Sprintf("ADD TO BUFFER Time %v, Seq %d, type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			buffer = append(buffer, msg)
+			sortBufferMessages(buffer)
 		}
 	}
 }
@@ -176,6 +179,12 @@ func getAllSectionOutputString() string {
 		totalOutText += output
 	}
 	return totalOutText
+}
+
+func sortBufferMessages(messages []BroadcastMessage) {
+	sort.Slice(messages, func(i, j int) bool {
+		return messages[i].seq < messages[j].seq
+	})
 }
 
 func sendBroadcastMessage(c chan<- BroadcastMessage, msg BroadcastMessage) {
