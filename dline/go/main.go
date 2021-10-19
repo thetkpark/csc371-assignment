@@ -54,17 +54,27 @@ func main() {
 	var messages []MessagesQueue
 
 	pterm.PrintDebugMessages = true
-	bt, _ := pterm.DefaultBigText.WithLetters(pterm.NewLettersFromString("D-LINE")).Srender()
+	bt, _ := pterm.DefaultBigText.WithLetters(pterm.NewLettersFromStringWithStyle("D-LINE", pterm.NewStyle(pterm.FgLightBlue))).Srender()
 	pterm.DefaultCenter.Print(bt)
 	pterm.DefaultCenter.WithCenterEachLineSeparately().Println(`This is a visualization of how D-LINE would deal with messages that are not received in order
-Please enter the messages that will be used in simulation. 
-Note that time that each messages are sent to sequencer is time you used before submit another message`)
+Please enter the messages that will be used in visualization. It will be played in same order and interval.
+Note that the time that each messages are sent to sequencer is time you used before submit another message
+There are 3 types of message you can choose from. 
+Each of them has the difference communication time delay from sequencer to the user
+- Text (1 second)
+- Image (5 seconds)
+- Video. (10 seconds)
+`)
 	// Receive input from user
 	for {
 		var msgTypeInput, msgType, textMsg string
+		correctType := true
 		fmt.Printf("\nPlease choose message type (Text, Image, Video) or 'End' to stop: ")
 		fmt.Scanf("%s",&msgTypeInput)
 		if strings.ToLower(msgTypeInput) == "end" {
+			if len(messages) == 0 {
+				pterm.Error.Println("Please enter at least one message")
+			}
 			break
 		}
 		switch strings.ToLower(msgTypeInput) {
@@ -77,6 +87,12 @@ Note that time that each messages are sent to sequencer is time you used before 
 		case Video:
 			msgType = Video
 			fmt.Printf("Please enter video title: ")
+		default:
+			correctType = false
+			pterm.Error.Println("Please enter the correct message type")
+		}
+		if !correctType {
+			continue
 		}
 		fmt.Scanf("%s", &textMsg)
 
@@ -101,7 +117,7 @@ Note that time that each messages are sent to sequencer is time you used before 
 		}
 	}
 	var isContinue string
-	fmt.Print("Your messages will be sent to sequencer in the order as shown above. Continue? [Y]es, [N]o: ")
+	fmt.Print("\nYour messages will be sent to sequencer in the order as shown above. Continue? [Y]es, [N]o: ")
 	fmt.Scanf("%s", &isContinue)
 	switch strings.ToLower(isContinue) {
 	case "y":
