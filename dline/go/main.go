@@ -58,16 +58,15 @@ func main() {
 	pterm.PrintDebugMessages = true
 	bt, _ := pterm.DefaultBigText.WithLetters(pterm.NewLettersFromStringWithStyle("D-LINE", pterm.NewStyle(pterm.FgLightBlue))).Srender()
 	pterm.DefaultCenter.Print(bt)
-	pterm.DefaultCenter.WithCenterEachLineSeparately().Println(`This is a visualization of how D-LINE deal with messages that are not received in order
+	pterm.DefaultBasicText.Println(`This is a visualization of how D-LINE deal with messages that are not received in order.
 Please enter the messages that will be used in visualization. It will be played in same order and interval.
-Note that the time that each messages are sent to sequencer is time you used before submit another message
+Note that the time that each messages are sent to sequencer is time you used before submit another message.
 There are 3 types of message you can choose from. 
 Each of them has the difference communication time delay from sequencer to the user.
 - Text (1 second + random communication time)
 - Image (5 seconds + random communication time)
 - Video. (10 seconds + random communication time)
-The random communication time is calculated when the sequencer forward message to each user.
-`)
+The random communication time is calculated when the sequencer forward message to each user. (range between 0-5 seconds)`)
 	// Receive input messages from user
 	for {
 		var msgTypeInput, msgType, textMsg string
@@ -150,7 +149,7 @@ The random communication time is calculated when the sequencer forward message t
 		wg.Add(n)
 		time.Sleep(message.waitDuration)
 		msgChan <- message.incomingMessage
-		printMessage(pterm.Success.Sprintfln("SENT MESSAGE, Time %v, Type %s, %s", time.Now().Unix(), message.incomingMessage.messageType, message.incomingMessage.message), 0, area)
+		printMessage(pterm.Success.Sprintfln("SENT MESSAGE, Timestamp %v, Type %s, %s", time.Now().Unix(), message.incomingMessage.messageType, message.incomingMessage.message), 0, area)
 	}
 	wg.Wait() // Wait for all goroutine to finish before exit
 }
@@ -166,13 +165,13 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 		msg := <- in
 		// If it's a expected message -> print it out
 		if localSeq + 1 == msg.seq {
-			printMessage(pterm.Success.Sprintf("RECEIVED MESSAGE AND DISPLAY, Time %v, Seq %d, Type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
+			printMessage(pterm.Success.Sprintf("RECEIVED MESSAGE AND DISPLAY, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			localSeq++
 			wg.Done()
 
 			// Look at the buffer to see if there is next message
 			for len(buffer) > 0 && localSeq + 1 == buffer[0].seq {
-				printMessage(pterm.Success.Sprintf("DISPLAY FROM BUFFER, Time %v, Seq %d, Type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
+				printMessage(pterm.Success.Sprintf("DISPLAY FROM BUFFER, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
 				sortBufferMessages(buffer)
 				localSeq++
@@ -180,7 +179,7 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 			}
 		} else {
 			// Not the expected message -> put in buffer and sort by sequence number
-			printMessage(pterm.Info.Sprintf("RECEIVED MESSAGE AND ADDED TO BUFFER, Time %v, Seq %d, Type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
+			printMessage(pterm.Info.Sprintf("RECEIVED MESSAGE AND ADDED TO BUFFER, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			buffer = append(buffer, msg)
 			sortBufferMessages(buffer)
 		}
@@ -195,7 +194,7 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 		// Wait for message from the main goroutine (That user inputs)
 		msg := <-incomingMsg
 		seq++
-		printMessage(pterm.Info.Sprintfln("RECEIVED MESSAGE, Time %v, Type %s, %s", time.Now().Unix(), msg.messageType, msg.message), 1, area)
+		printMessage(pterm.Info.Sprintfln("RECEIVED MESSAGE, Timestamp %v, Type %s, %s", time.Now().Unix(), msg.messageType, msg.message), 1, area)
 		for i, process := range broadcast{
 			// Sending message with sequence number to every user through channel
 			go sendBroadcastMessage(process, BroadcastMessage{
@@ -203,7 +202,7 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 				message: msg.message,
 				messageType: msg.messageType,
 			})
-			printMessage(pterm.Success.Sprintfln("SENT MESSAGE TO USER %d, Time %v, Seq %d, Type %s, %s", i+1, time.Now().Unix(), seq, msg.messageType, msg.message), 1, area)
+			printMessage(pterm.Success.Sprintfln("SENT MESSAGE TO USER %d, Timestamp %v, Seq %d, Type %s, %s", i+1, time.Now().Unix(), seq, msg.messageType, msg.message), 1, area)
 		}
 	}
 }
