@@ -126,8 +126,7 @@ The random communication time is calculated when the sequencer forward message t
 	fmt.Print("\nYour messages will be sent to sequencer in the order as shown above. Continue? [Y]es, [N]o: ")
 	fmt.Scanf("%s", &isContinue)
 	switch strings.ToLower(isContinue) {
-	case "y":
-	case "yes":
+	case "y", "yes":
 	default:
 		os.Exit(0)
 	}
