@@ -90,17 +90,21 @@ We come up with 3 test cases.
 
      
 
-3. There are many messages in buffer.
+3. There are many messages in buffer
 
-   - sender send five messgae in this order
+   - Input: sender send five messgaes in the following order
 
-     - | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
-       | ----- | ------- | ------------------------------------------------ | ------------------------ |
-       | Text  | 1       | 2 seconds                                        | 1 second + random time   |
-       | Text  | 2       | 2 seconds                                        | 1 second + random time   |
-       | Video | 3       | 2 seconds                                        | 10 seconds + random time |
-       | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
-       | Text  | 5       | 2 seconds                                        | 1 second + random time   |
+     ![Screen Shot 2564-10-23 at 22.57.28](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 22.57.28.png)
+
+     ![Screen Shot 2564-10-23 at 22.57.35](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 22.57.35.png)
+
+     | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
+     | ----- | ------- | ------------------------------------------------ | ------------------------ |
+     | Text  | 1       | 2 seconds                                        | 1 second + random time   |
+     | Text  | 2       | 2 seconds                                        | 1 second + random time   |
+     | Video | 3       | 2 seconds                                        | 10 seconds + random time |
+     | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
+     | Text  | 5       | 2 seconds                                        | 1 second + random time   |
 
      
 
@@ -108,11 +112,40 @@ We come up with 3 test cases.
 
 # Simulation results
 
+These are result of the test scenarios
 
+1. There is no message in buffer
 
+2. There is one message in buffer
 
+3. There are many messages in buffer
+
+   ![Screen Shot 2564-10-23 at 23.29.04](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 23.29.04.png)
+
+   Sequencer receives messages from main thread in the order that message was sent. Each time sequence receive the message, it will send message to all users (one message might reach users in the different time due to the random communication time).
+
+   
+
+   ![Screen Shot 2564-10-23 at 23.33.58](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 23.33.58.png)
+
+   User1 receive message 1, and 2 respectively, so when it receive message it can be displayed. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
+
+   
+
+   
 
 # User manuals
+
+All you need to do is just install Go by accessing link below
+
+https://golang.org/doc/install
+
+Then change directory to the project directory and use go run command to run simulator
+
+```
+cd dline/go
+go run main.go
+```
 
 
 
