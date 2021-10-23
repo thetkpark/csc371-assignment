@@ -10,11 +10,10 @@ In order to ensure that every message will be displayed to the users in the same
 
 # The implement of the solution 
 
-Our solution is implemented in Golang due to these following reasons.
-
-1. Golang was designed to support concurrency with Goroutine which is the higher abstraction level of thread and process
-2. It has many many tools to control the concurrency when entering critical section such as Mutex and WaitGroup.
-3. The communication between Goroutine can be done easily using Channel.
+Our solution is implemented in Golang due to the following reasons.
+   1. Golang support concurrency with Goroutine which is the higher abstraction level of thread and process
+   2. It has many tools to control the concurrency when entering critical sections such as Mutex and WaitGroup.
+   3. The communication between Goroutine can be done easily using Channel.
 
 ## Data Structures
 
@@ -26,7 +25,7 @@ type MulticastMessage struct {
 }
 ```
 
-The **MulticastMessage** struct defined the data structure of the data that the sequencer sent to each user/process. It contains message, message type, and sequence number assigned by the sequencer.
+The **MulticastMessage** struct defined the data structure of the data that the sequencer sent to each user/process. It contains the message, message type, and sequence number assigned by the sequencer.
 
 ```go
 type IncomingMessage struct {
@@ -35,7 +34,7 @@ type IncomingMessage struct {
 }
 ```
 
-**IncomingMessage** struct represent the message that sent from main goroutine to the sequencer.
+**IncomingMessage** struct represents the message sent from the main goroutine to the sequencer.
 
 ```go
 type MessagesQueue struct {
@@ -49,19 +48,19 @@ type MessagesQueue struct {
 
 ## Main Goroutine
 
-The main function is the entry point where the Go application is compiled and run. It responsible for these following tasks
+The main function is the entry point where the Go application is compiled and run. It responsible for the following tasks
 
 1. Printing the instruction message to the console
-2. Create communication channels from main Goroutine to the sequencer and sequencer to all of the user. Total number of channel is 4 (3 User).
-3. Receiving message and type of message from console
-4. Spawning n number of user (3 is default) and a sequencer in another Goroutine with appropriate parameters.
-5. Sending all the messages to sequencer regarding the order and time interval between each message.
-6. Wait for every messages are delivered and displayed at each user
+2. Create communication channels from the main Goroutine to the sequencer and sequencer to all of the users. The total number of Channels is 4 (3 Users).
+3. Receiving message and type of message from the console
+4. Spawning n number of user/process (3 is the default) and a sequencer in another Goroutine with appropriate parameters.
+5. Sending all the messages to the sequencer regarding the order and time interval between each message.
+6. Wait for every message are delivered and displayed at each user
 7. Terminate the execution once done.
 
 ## Sequencer
 
-The purpose of the sequencer is assigning the message with running sequence number and sent them out to each user. It has only one variable which is the global sequence number initially start at 0. The sequencer is running in infinite loop that waiting for new message (IncomingMessage data structure) to come in though Channel. Once the message comes, the global sequence variable is increase by 1 and **IncomingMessage** is transform into **MulticastMessage**. The **MulticastMessage** is sent to each user through Channels. For simulating the communication time, we spawn another Goroutine for every message sending process. It responsible for determine how much time to wait and actually wait before sending message to the user using `time.Sleep()` function. We decided to spawn another Goroutine to do this job because using `time.Sleep()` function would block the  **IncomingMessage** from Main Goroutine to come in to the sequencer and also block the message sending process from sequencer to another user as well.
+The purpose of the sequencer is to assign the message with a running sequence number and send them out to each user. It has only one variable which is the global sequence number initially starting at 0. The sequencer is running in an infinite loop that waiting for a new message (IncomingMessage data structure) to come in through Channel. Once the message comes, the global sequence variable is increased by 1, and **IncomingMessage** is transformed into **MulticastMessage**. The **MulticastMessage** is sent to each user through Channels. For simulating the communication time, we spawn a `sendMulticastMessage` function another Goroutine for every message sending process. It is responsible for determining communication time to the user and using `time.Sleep()` function to simulate the communication time delay. We decided to spawn another Goroutine to do this job because of using `time.Sleep()` function would block the **IncomingMessage** from Main Goroutine to coming into the sequencer and also block the message sending process from sequencer to another user as well.
 
 # Test scenarios
 
