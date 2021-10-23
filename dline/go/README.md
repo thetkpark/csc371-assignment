@@ -64,9 +64,47 @@ Each user is the same function that is running in the difference Goroutine. It m
 
 # Test scenarios
 
+According to our solution, there are 3 users (user1, user2, and user3), has only one sender that send message to sender, and there are 3 types of message (text, image, video).
 
+Total communication time of each message = communication time of message type + random communicate time (range between 0-5 seconds). Note that communication time is randomed when sequencer send message to each user (it might be different)
 
+1. Text (1 second + random communication time)
+2. Image (5 seconds + random communication time)
+3. Video (10 seconds + random communication time)
 
+We come up with 3 test cases.
+
+1. There is no message in buffer
+
+2. There is one message in buffer
+
+   - Sender send five message in this order
+
+     - | Type | Message | Waiting time before<br />send next message |      |
+       | ---- | ------- | ------------------------------------------ | ---- |
+       |      |         |                                            |      |
+       |      |         |                                            |      |
+       |      |         |                                            |      |
+       |      |         |                                            |      |
+       |      |         |                                            |      |
+
+     
+
+3. There are many messages in buffer.
+
+   - sender send five messgae in this order
+
+     - | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
+       | ----- | ------- | ------------------------------------------------ | ------------------------ |
+       | Text  | 1       | 2 seconds                                        | 1 second + random time   |
+       | Text  | 2       | 2 seconds                                        | 1 second + random time   |
+       | Video | 3       | 2 seconds                                        | 10 seconds + random time |
+       | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
+       | Text  | 5       | 2 seconds                                        | 1 second + random time   |
+
+     
+
+     
 
 # Simulation results
 
