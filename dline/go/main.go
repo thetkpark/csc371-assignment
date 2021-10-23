@@ -13,35 +13,39 @@ import (
 
 // BroadcastMessage defined the data structure that the sequencer sent to each user/process
 type BroadcastMessage struct {
-	seq uint
-	message string
+	seq         uint
+	message     string
 	messageType string
 }
+
 // IncomingMessage represent the message from the user received via console that later will be sent to sequencer
 type IncomingMessage struct {
-	message string
+	message     string
 	messageType string
 }
+
 // MessagesQueue defined the data structure of the recorded input message from the user via console input.
 // It will be used later when the user stop typing the input message.
 type MessagesQueue struct {
 	incomingMessage IncomingMessage
-	waitDuration time.Duration
-	timestamp time.Time
+	waitDuration    time.Duration
+	timestamp       time.Time
 }
 
 // Defined the constants
-const(
-	Text string = "text"
+const (
+	Text  string = "text"
 	Image string = "image"
 	Video string = "video"
-	n int = 3
+	n     int    = 3
 )
 
 // WaitGroup is used to stop the main goroutine to exiting early and wait for all process/user and sequencer to get their works done.
 var wg sync.WaitGroup
+
 // Mutex is used to prevent two goroutine to enter critical section at the same time. Also helped to display the output that not overlap.
 var m sync.Mutex
+
 // outputs is used to store all the output in string. It will be later render by Ptem library to update the text area.
 var outputs []string
 
@@ -50,8 +54,8 @@ func main() {
 	outputs = make([]string, n+2) // create slides of outputs that for each user/process + main thread and sequencer
 	outputs[0] = pterm.DefaultSection.WithLevel(1).Sprintln("Main")
 	outputs[1] = pterm.DefaultSection.WithLevel(2).Sprintln("Sequencer")
-	broadcastChan := make([]chan BroadcastMessage, n) // create n number of channel for communication between sequencer and each user/process
-	msgChan := make(chan IncomingMessage) // create a channel of communication for main goroutine to send message to sequencer in another goroutine
+	multicastChan := make([]chan BroadcastMessage, n) // create n number of channel for communication between sequencer and each user/process
+	msgChan := make(chan IncomingMessage)             // create a channel of communication for main goroutine to send message to sequencer in another goroutine
 	var messages []MessagesQueue
 
 	// Print the welcoming message and instruction to the user
@@ -72,7 +76,7 @@ The random communication time is calculated when the sequencer forward message t
 		var msgTypeInput, msgType, textMsg string
 		correctType := true
 		fmt.Printf("\nPlease choose message type (Text, Image, Video) or 'End' to stop: ")
-		fmt.Scanf("%s",&msgTypeInput)
+		fmt.Scanln(&msgTypeInput)
 		if strings.ToLower(msgTypeInput) == "end" {
 			// If the user have not input any message -> not let them out
 			if len(messages) == 0 {
@@ -97,7 +101,7 @@ The random communication time is calculated when the sequencer forward message t
 		if !correctType {
 			continue
 		}
-		fmt.Scanf("%s", &textMsg)
+		fmt.Scanln(&textMsg)
 
 		// Calculate a interval between message
 		var waitDuration int64
@@ -117,14 +121,14 @@ The random communication time is calculated when the sequencer forward message t
 	// Print out all the input messages
 	for i, msg := range messages {
 		pterm.DefaultCenter.Printf("\nType %s, %s", msg.incomingMessage.messageType, msg.incomingMessage.message)
-		if i < len(messages) - 1 {
+		if i < len(messages)-1 {
 			pterm.DefaultCenter.Printf("\n|\n| %v seconds\n∨", messages[i+1].waitDuration.Round(time.Second).Seconds())
 		}
 	}
 	// Ask for user confirmation before continue
 	var isContinue string
 	fmt.Print("\nYour messages will be sent to sequencer in the order as shown above. Continue? [Y]es, [N]o: ")
-	fmt.Scanf("%s", &isContinue)
+	fmt.Scanln(&isContinue)
 	switch strings.ToLower(isContinue) {
 	case "y", "yes":
 	default:
@@ -134,14 +138,14 @@ The random communication time is calculated when the sequencer forward message t
 
 	// Create updatable output console area
 	area, _ := pterm.DefaultArea.Start()
-	for i:=0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		// Spawn the user/process
-		broadcastChan[i] = make(chan BroadcastMessage)
+		multicastChan[i] = make(chan BroadcastMessage)
 		outputs[i+2] = pterm.DefaultSection.WithLevel(i+1+2).Sprintln("User ", i+1)
-		go process(broadcastChan[i], i+2, area)
+		go process(multicastChan[i], i+2, area)
 	}
 	// Spawn the sequencer
-	go sequencer(msgChan, broadcastChan, area)
+	go sequencer(msgChan, multicastChan, area)
 
 	// Sending message one by one to sequencer with time delay
 	for _, message := range messages {
@@ -155,21 +159,21 @@ The random communication time is calculated when the sequencer forward message t
 
 // process represent the user in D-LINE
 func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
-	var localSeq uint = 0 // Local sequence number of the user/process
+	var localSeq uint = 0         // Local sequence number of the user/process
 	var buffer []BroadcastMessage // Buffer for un-order message
 
 	// Run process in infinite loop
 	for {
 		// Wait for a message to come in through channel
-		msg := <- in
+		msg := <-in
 		// If it's a expected message -> print it out
-		if localSeq + 1 == msg.seq {
+		if localSeq+1 == msg.seq {
 			printMessage(pterm.Success.Sprintf("RECEIVED MESSAGE AND DISPLAY, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), msg.seq, msg.messageType, msg.message), num, area)
 			localSeq++
 			wg.Done()
 
 			// Look at the buffer to see if there is next message
-			for len(buffer) > 0 && localSeq + 1 == buffer[0].seq {
+			for len(buffer) > 0 && localSeq+1 == buffer[0].seq {
 				printMessage(pterm.Success.Sprintf("DISPLAY FROM BUFFER, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
 				sortBufferMessages(buffer)
@@ -194,11 +198,11 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 		msg := <-incomingMsg
 		seq++
 		printMessage(pterm.Info.Sprintfln("RECEIVED MESSAGE, Timestamp %v, Type %s, %s", time.Now().Unix(), msg.messageType, msg.message), 1, area)
-		for i, process := range broadcast{
+		for i, process := range broadcast {
 			// Sending message with sequence number to every user through channel
 			go sendBroadcastMessage(process, BroadcastMessage{
-				seq:     seq,
-				message: msg.message,
+				seq:         seq,
+				message:     msg.message,
 				messageType: msg.messageType,
 			})
 			printMessage(pterm.Success.Sprintfln("SENT MESSAGE TO USER %d, Timestamp %v, Seq %d, Type %s, %s", i+1, time.Now().Unix(), seq, msg.messageType, msg.message), 1, area)
