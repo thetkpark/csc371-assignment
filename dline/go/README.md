@@ -80,13 +80,13 @@ We come up with 3 test cases.
 
    - Sender send five message in this order
 
-     - | Type | Message | Waiting time before<br />send next message |      |
-       | ---- | ------- | ------------------------------------------ | ---- |
-       |      |         |                                            |      |
-       |      |         |                                            |      |
-       |      |         |                                            |      |
-       |      |         |                                            |      |
-       |      |         |                                            |      |
+     | Type | Message | Waiting time before<br />send next message | Communication<br />Time |
+     | ---- | ------- | ------------------------------------------ | ----------------------- |
+     |      |         |                                            |                         |
+     |      |         |                                            |                         |
+     |      |         |                                            |                         |
+     |      |         |                                            |                         |
+     |      |         |                                            |                         |
 
      
 
@@ -94,9 +94,9 @@ We come up with 3 test cases.
 
    - Input: sender send five messgaes in the following order
 
-     ![Screen Shot 2564-10-23 at 22.57.28](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 22.57.28.png)
+     ![Screen Shot 2564-10-23 at 22.57.28](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 22.57.28.png)
 
-     ![Screen Shot 2564-10-23 at 22.57.35](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 22.57.35.png)
+     ![Screen Shot 2564-10-23 at 22.57.35](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 22.57.35.png)
 
      | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
      | ----- | ------- | ------------------------------------------------ | ------------------------ |
@@ -120,19 +120,29 @@ These are result of the test scenarios
 
 3. There are many messages in buffer
 
-   ![Screen Shot 2564-10-23 at 23.29.04](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 23.29.04.png)
+   ![Screen Shot 2564-10-23 at 23.29.04](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.29.04.png)
 
    Sequencer receives messages from main thread in the order that message was sent. Each time sequence receive the message, it will send message to all users (one message might reach users in the different time due to the random communication time).
 
    
 
-   ![Screen Shot 2564-10-23 at 23.33.58](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/Screen Shot 2564-10-23 at 23.33.58.png)
+   ![Screen Shot 2564-10-23 at 23.33.58](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.33.58.png)
 
-   User1 receive message 1, and 2 respectively, so when it receive message it can be displayed. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
-
-   
+   User1 receive and display message 1, and 2 respectively. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
 
    
+
+   ![Screen Shot 2564-10-23 at 23.39.53](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.39.53.png)
+
+   User2 receive an display message 1, and 2 respectively. After that it receives message 5 which sequence number is 5 but the sequence of user2 is 2. So message5 will be put int buffer. Then user2 receive message3 (sequence = 3), and sequence of user2 is 2. So message3 can be displayed. After that user2 iterate all messages in buffer which contains message5 (seq = 5 ) but it cannot be displayed because seq of user2 is 3 and 3+1 != 5. After that user2 receive and display message4 because 3+1 = 4. Finally, user2 iterate all messages in buffer and can display message5 because 4+1 = 5.
+
+
+
+​	![Screen Shot 2564-10-23 at 23.42.39](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.42.39.png)
+
+​		For user3 is same as user1.
+
+
 
 # User manuals
 
