@@ -47,7 +47,17 @@ type MessagesQueue struct {
 
 **MessagesQueue** defined the data structure of the recorded input message from the user given thorough console input. It has `waitDuration` to tell the main goroutine the interval time between this message and the previous message.
 
+## Main Goroutine
 
+The main function is the entry point where the Go application is compiled and run. It responsible for these following tasks
+
+1. Printing the instruction message to the console
+2. Create communication channels from main Goroutine to the sequencer and sequencer to all of the user. Total number of channel is 4 (3 User).
+3. Receiving message and type of message from console
+4. Spawning n number of user (3 is default) and a sequencer in another Goroutine with appropriate parameters.
+5. Sending all the messages to sequencer regarding the order and time interval between each message.
+6. Wait for every messages are delivered and displayed at each user
+7. Terminate the execution once done.
 
 # Test scenarios
 
