@@ -26,7 +26,7 @@ type MulticastMessage struct {
 }
 ```
 
-The **BroadcastMessage** struct defined the data structure of the data that the sequencer sent to each user/process. It contains message, message type, and sequence number assigned by the sequencer.
+The **MulticastMessage** struct defined the data structure of the data that the sequencer sent to each user/process. It contains message, message type, and sequence number assigned by the sequencer.
 
 ```go
 type IncomingMessage struct {
@@ -58,6 +58,10 @@ The main function is the entry point where the Go application is compiled and ru
 5. Sending all the messages to sequencer regarding the order and time interval between each message.
 6. Wait for every messages are delivered and displayed at each user
 7. Terminate the execution once done.
+
+## Sequencer
+
+The purpose of the sequencer is assigning the message with running sequence number and sent them out to each user. It has only one variable which is the global sequence number initially start at 0. The sequencer is running in infinite loop that waiting for new message (IncomingMessage data structure) to come in though Channel. Once the message comes, the global sequence variable is increase by 1 and **IncomingMessage** is transform into **MulticastMessage**. The **MulticastMessage** is sent to each user through Channels. For simulating the communication time, we spawn another Goroutine for every message sending process. It responsible for determine how much time to wait and actually wait before sending message to the user using `time.Sleep()` function. We decided to spawn another Goroutine to do this job because using `time.Sleep()` function would block the  **IncomingMessage** from Main Goroutine to come in to the sequencer and also block the message sending process from sequencer to another user as well.
 
 # Test scenarios
 
