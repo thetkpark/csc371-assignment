@@ -60,7 +60,7 @@ The purpose of the sequencer is to assign the message with a running sequence nu
 
 ## User
 
-
+Each user is the same function that is running in the difference Goroutine. It maintains the local sequence number in the integer variable and the array of **MulticastMessage** for the messages buffer. The user is running in an infinite loop. It waiting for an incoming message from the Channel and processes that message. When the message comes in, the message sequence number is compared with the local sequence number. If the message sequence number equals to local sequence number + 1, then the message will be displayed to the console and the local sequence number is increased by 1. After that, the buffer is checked if there is more message that satisfies the displaying condition. On the other hand, if the message sequence number is not equal to the local sequence number + 1, that message is put in the buffer. After that, the whole buffer is sorted by message sequence number for easier comparison.
 
 # Test scenarios
 
@@ -76,3 +76,10 @@ The purpose of the sequencer is to assign the message with a running sequence nu
 
 # User manuals
 
+
+
+# Team Members
+
+- 62130500209 Thanakorn Aungunchuchod
+- 62130500212 Thanaphon Sombunkaeo
+- 62130500230 Sethanant Pipatpakorn
