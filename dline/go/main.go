@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-// BroadcastMessage defined the data structure that the sequencer sent to each user/process
-type BroadcastMessage struct {
+// MulticastMessage defined the data structure that the sequencer sent to each user/process
+type MulticastMessage struct {
 	seq         uint
 	message     string
 	messageType string
@@ -54,7 +54,7 @@ func main() {
 	outputs = make([]string, n+2) // create slides of outputs that for each user/process + main thread and sequencer
 	outputs[0] = pterm.DefaultSection.WithLevel(1).Sprintln("Main")
 	outputs[1] = pterm.DefaultSection.WithLevel(2).Sprintln("Sequencer")
-	multicastChan := make([]chan BroadcastMessage, n) // create n number of channel for communication between sequencer and each user/process
+	multicastChan := make([]chan MulticastMessage, n) // create n number of channel for communication between sequencer and each user/process
 	msgChan := make(chan IncomingMessage)             // create a channel of communication for main goroutine to send message to sequencer in another goroutine
 	var messages []MessagesQueue
 
@@ -140,16 +140,16 @@ The random communication time is calculated when the sequencer forward message t
 	area, _ := pterm.DefaultArea.Start()
 	for i := 0; i < n; i++ {
 		// Spawn the user/process
-		multicastChan[i] = make(chan BroadcastMessage)
+		multicastChan[i] = make(chan MulticastMessage)
 		outputs[i+2] = pterm.DefaultSection.WithLevel(i+1+2).Sprintln("User ", i+1)
 		go process(multicastChan[i], i+2, area)
 	}
 	// Spawn the sequencer
 	go sequencer(msgChan, multicastChan, area)
 
+	wg.Add(n * len(messages))
 	// Sending message one by one to sequencer with time delay
 	for _, message := range messages {
-		wg.Add(n)
 		time.Sleep(message.waitDuration)
 		msgChan <- message.incomingMessage
 		printMessage(pterm.Success.Sprintfln("SENT MESSAGE, Timestamp %v, Type %s, %s", time.Now().Unix(), message.incomingMessage.messageType, message.incomingMessage.message), 0, area)
@@ -158,9 +158,9 @@ The random communication time is calculated when the sequencer forward message t
 }
 
 // process represent the user in D-LINE
-func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
+func process(in <-chan MulticastMessage, num int, area *pterm.AreaPrinter) {
 	var localSeq uint = 0         // Local sequence number of the user/process
-	var buffer []BroadcastMessage // Buffer for un-order message
+	var buffer []MulticastMessage // Buffer for un-order message
 
 	// Run process in infinite loop
 	for {
@@ -176,7 +176,6 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 			for len(buffer) > 0 && localSeq+1 == buffer[0].seq {
 				printMessage(pterm.Success.Sprintf("DISPLAY FROM BUFFER, Timestamp %v, Seq %d, Type %s, %s\n", time.Now().Unix(), buffer[0].seq, buffer[0].messageType, buffer[0].message), num, area)
 				buffer = buffer[1:]
-				sortBufferMessages(buffer)
 				localSeq++
 				wg.Done()
 			}
@@ -190,7 +189,7 @@ func process(in <-chan BroadcastMessage, num int, area *pterm.AreaPrinter) {
 }
 
 // sequencer represent the central server that order all the messages
-func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMessage, area *pterm.AreaPrinter) {
+func sequencer(incomingMsg <-chan IncomingMessage, multicast []chan MulticastMessage, area *pterm.AreaPrinter) {
 	var seq uint = 0
 
 	for {
@@ -198,9 +197,9 @@ func sequencer(incomingMsg <-chan IncomingMessage, broadcast []chan BroadcastMes
 		msg := <-incomingMsg
 		seq++
 		printMessage(pterm.Info.Sprintfln("RECEIVED MESSAGE, Timestamp %v, Type %s, %s", time.Now().Unix(), msg.messageType, msg.message), 1, area)
-		for i, process := range broadcast {
+		for i, process := range multicast {
 			// Sending message with sequence number to every user through channel
-			go sendBroadcastMessage(process, BroadcastMessage{
+			go sendMulticastMessage(process, MulticastMessage{
 				seq:         seq,
 				message:     msg.message,
 				messageType: msg.messageType,
@@ -229,15 +228,15 @@ func getAllSectionOutputString() string {
 }
 
 // sortBufferMessages sort the order of the messages in buffer by its sequence number in ascending format
-func sortBufferMessages(messages []BroadcastMessage) {
+func sortBufferMessages(messages []MulticastMessage) {
 	sort.Slice(messages, func(i, j int) bool {
 		return messages[i].seq < messages[j].seq
 	})
 }
 
-// sendBroadcastMessage is used to simulate sending message from sequencer to user
+// sendMulticastMessage is used to simulate sending message from sequencer to user
 // It used time.Sleep(duration) to simulate delay in communication
-func sendBroadcastMessage(c chan<- BroadcastMessage, msg BroadcastMessage) {
+func sendMulticastMessage(c chan<- MulticastMessage, msg MulticastMessage) {
 	var sleepDuration int64
 	switch msg.messageType {
 	case Text:
