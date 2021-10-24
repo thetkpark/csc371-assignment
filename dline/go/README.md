@@ -76,10 +76,10 @@ We come up with 3 test cases.
 
 1. There is no message in buffer
    
-     ![Screen Shot 2564-10-24 at 12.36.12](/Users/note/Library/Application Support/typora-user-images/Screen Shot 2564-10-24 at 12.36.12.png)
+     ![test-case-1.png](https://drive.google.com/uc?export=view&id=1NH98u6nr3ih1ck0FNkigxMRe0ZuykLtr)
      
-     ![Screen Shot 2564-10-24 at 12.34.49](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.34.49.png)
-     
+    ![test-case-1-duration.png](https://drive.google.com/uc?export=view&id=1yarum4UxEs5HhXpjKI_eyHJ8VYw6RoX-)
+    
      | Type | Message | Waiting time before<br />send next message | Communication<br />Time |
      | ---- | ------- | ------------------------------------------ | ----------------------- |
      | Text1  | 1     |  3 Second                                        | 1 second + random time |
@@ -92,10 +92,11 @@ We come up with 3 test cases.
 2. There is one message in buffer
 
    - Sender send five message in this order
-
-     ![Screen Shot 2564-10-24 at 12.59.03](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.59.03.png)
      
-     ![Screen Shot 2564-10-24 at 12.58.19](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.58.19.png)
+     ![test-case-2.png](https://drive.google.com/uc?export=view&id=1FZqgyf6X11sT7zXsS-rzC0WLHc87Im_7)
+
+     ![test-case-2-duration.png](https://drive.google.com/uc?export=view&id=1c0O2gp2awdeXXeYVyjV9LPf7KLPtoj9c)
+
      
      | Type  | Message | Waiting time before<br />send next message | Communication<br />Time |
      | ----- | ------- | ------------------------------------------ | ----------------------- |
@@ -122,7 +123,7 @@ We come up with 3 test cases.
      | Text  | 1       | 2 seconds                                        | 1 second + random time   |
      | Text  | 2       | 2 seconds                                        | 1 second + random time   |
      | Video | 3       | 2 seconds                                        | 10 seconds + random time |
-| Image | 4       | 2 seconds                                        | 5 seconds + random time  |
+     | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
      | Text  | 5       | 2 seconds                                        | 1 second + random time   |
 
      
@@ -134,8 +135,37 @@ We come up with 3 test cases.
 These are result of the test scenarios
 
 1. There is no message in buffer
+  ![main-test-case-1.png](https://drive.google.com/uc?export=view&id=1T-sX7M7i5985wIJDViXlihomGnvvIqWg)
+
+
+Main Thread send the message following by the order to the sequencer.
+
+![sequence-test-case-1.png](https://drive.google.com/uc?export=view&id=1OhN7Zys3YFexTWrAxwX7A4uiGS9LMYVl)
+
+​	Sequencer will receiver message from main thread in the order. Each time of sequencer recieve the message, it will sent the message to all user (Each message will have different timestamp from the communication time that haver random number).
+
+![result-test-case-1.png](https://drive.google.com/uc?export=view&id=1tro6R0pHqK1J0RuW9EOcfzyGd-pgcfI1)
+
+From the result in this scenario, it didn't have any buffer. So, it will recieve all the message in respectively.
 
 2. There is one message in buffer
+
+![main-test-case-2.png](https://drive.google.com/uc?export=view&id=1Bozy0WubVFlIDZZOqIPvq8eNTnPw7Hcb)
+
+Main Thread send the message following by the order to the sequencer.
+
+![sequence-test-case-2.png](https://drive.google.com/uc?export=view&id=1nja5WdQAxlovFXZmIUpVIS1j4RUXaQqE)
+
+​	Sequencer will receiver message from main thread in the order. Each time of sequencer recieve the message, it will sent the message to all user (Each message will have different timestamp from the communication time that haver random number).
+
+![resulte-test-case-2.png](https://drive.google.com/uc?export=view&id=1LXw1MnmWerBGv_j49gZzQ8K8WQLuiz3o)
+
+From the result in this scenarios, User1 recieve the Video1 and Text 1 in order with no buffer. This situation happend by the text message (15 second) had duration more than Video (12 second) to sent the message in order. Then User1 will recieve image1 and image2 but image2 was wrong sequence number, so User1 will waiting to get Video2 and adding image 2 to buffer. Then, User1 will receive Video2  and go into the buffer to display the image 2.
+
+User2 have same order the message with User1.
+
+User3 have same order the message with User1. 
+
 
 3. There are many messages in buffer
 
