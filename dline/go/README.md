@@ -75,19 +75,36 @@ Total communication time of each message = communication time of message type + 
 We come up with 3 test cases.
 
 1. There is no message in buffer
+     
+     ![Screen Shot 2564-10-24 at 12.36.12](/Users/note/Library/Application Support/typora-user-images/Screen Shot 2564-10-24 at 12.36.12.png)
+     
+     ![Screen Shot 2564-10-24 at 12.34.49](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.34.49.png)
+     
+     | Type | Message | Waiting time before<br />send next message | Communication<br />Time |
+     | ---- | ------- | ------------------------------------------ | ----------------------- |
+     | Text1  | 1     |  3 Second                                        | 1 second + random time |
+     | Text | 2 | 4 Second | 1 second + random time |
+     | Image | 1 | 4 Second | 5 second + random time |
+     | Image | 2 | 5 Second | 5 second + random time |
+     | Video | 1 | 4 Second | 10 second + random time |
+
 
 2. There is one message in buffer
 
    - Sender send five message in this order
 
-     | Type | Message | Waiting time before<br />send next message | Communication<br />Time |
-     | ---- | ------- | ------------------------------------------ | ----------------------- |
-     |      |         |                                            |                         |
-     |      |         |                                            |                         |
-     |      |         |                                            |                         |
-     |      |         |                                            |                         |
-     |      |         |                                            |                         |
-
+     ![Screen Shot 2564-10-24 at 12.59.03](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.59.03.png)
+     
+     ![Screen Shot 2564-10-24 at 12.58.19](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.58.19.png)
+     
+     | Type  | Message | Waiting time before<br />send next message | Communication<br />Time |
+     | ----- | ------- | ------------------------------------------ | ----------------------- |
+     | Video | 1       | 2 Second                                   | 10 second + random time |
+     | Text  | 1       | 15 Second                                  | 1 second + random time  |
+     | Image | 1       | 3 Second                                   | 5 second + random time  |
+     | Video | 2       | 11 Second                                  | 10 second + random time |
+     | Image | 2       | 2 Second                                   | 5 second + random time  |
+     
      
 
 3. There are many messages in buffer
