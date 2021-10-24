@@ -75,7 +75,7 @@ Total communication time of each message = communication time of message type + 
 We come up with 3 test cases.
 
 1. There is no message in buffer
-     
+   
      ![Screen Shot 2564-10-24 at 12.36.12](/Users/note/Library/Application Support/typora-user-images/Screen Shot 2564-10-24 at 12.36.12.png)
      
      ![Screen Shot 2564-10-24 at 12.34.49](/Users/note/Desktop/Screen Shot 2564-10-24 at 12.34.49.png)
@@ -111,20 +111,22 @@ We come up with 3 test cases.
 
    - Input: sender send five messgaes in the following order
 
-     ![Screen Shot 2564-10-23 at 22.57.28](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 22.57.28.png)
+     ![test-case-3-input.png](https://drive.google.com/uc?export=view&id=1DpY2wnb-UpgAmi4_Z1yGmcwuWbqOS3o9)
 
-     ![Screen Shot 2564-10-23 at 22.57.35](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 22.57.35.png)
+     
 
+     ![test-case-3-messages.png](https://drive.google.com/uc?export=view&id=1PhBB5VDpe5nzyJJ6Ywutr8zgcCXsjmbX)
+     
      | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
      | ----- | ------- | ------------------------------------------------ | ------------------------ |
      | Text  | 1       | 2 seconds                                        | 1 second + random time   |
      | Text  | 2       | 2 seconds                                        | 1 second + random time   |
      | Video | 3       | 2 seconds                                        | 10 seconds + random time |
-     | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
+| Image | 4       | 2 seconds                                        | 5 seconds + random time  |
      | Text  | 5       | 2 seconds                                        | 1 second + random time   |
 
      
-
+     
      
 
 # Simulation results
@@ -137,27 +139,27 @@ These are result of the test scenarios
 
 3. There are many messages in buffer
 
-   ![Screen Shot 2564-10-23 at 23.29.04](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.29.04.png)
+   ![test-case-3-sequencer.png](https://drive.google.com/uc?export=view&id=18e1Nf2DLaLeK2EQLUGwFjs-0OFmxp70t)
 
    Sequencer receives messages from main thread in the order that message was sent. Each time sequence receive the message, it will send message to all users (one message might reach users in the different time due to the random communication time).
 
    
 
-   ![Screen Shot 2564-10-23 at 23.33.58](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.33.58.png)
+   ![test-case-3-user-1.png](https://drive.google.com/uc?export=view&id=1tLsXUw5m74C6H8DGuYczfmWGuWFz7bw2)
 
    User1 receive and display message 1, and 2 respectively. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
 
    
 
-   ![Screen Shot 2564-10-23 at 23.39.53](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.39.53.png)
+   ![test-case-3-user-2.png](https://drive.google.com/uc?export=view&id=1HmNWPCNANVio8rH-Glh8L8GdiWgckEBK)
 
    User2 receive an display message 1, and 2 respectively. After that it receives message 5 which sequence number is 5 but the sequence of user2 is 2. So message5 will be put int buffer. Then user2 receive message3 (sequence = 3), and sequence of user2 is 2. So message3 can be displayed. After that user2 iterate all messages in buffer which contains message5 (seq = 5 ) but it cannot be displayed because seq of user2 is 3 and 3+1 != 5. After that user2 receive and display message4 because 3+1 = 4. Finally, user2 iterate all messages in buffer and can display message5 because 4+1 = 5.
 
 
 
-​	![Screen Shot 2564-10-23 at 23.42.39](/Users/boyplus/Desktop/MyGit/csc371-assignment/dline/go/Document/test-images/3/Screen Shot 2564-10-23 at 23.42.39.png)
+​	![test-case-3-user-3.png](https://drive.google.com/uc?export=view&id=1BT_0iMIFCFF_fuO8tebr7ofoLgFN_PhQ)
 
-​		For user3 is same as user1.
+​		The order of messages that user3 receive is same as user1.
 
 
 
@@ -166,6 +168,8 @@ These are result of the test scenarios
 All you need to do is just install Go by accessing link below
 
 https://golang.org/doc/install
+
+After complete the installation, please close the current terminal or command line and open new one.
 
 Then change directory to the project directory and use go run command to run simulator
 
