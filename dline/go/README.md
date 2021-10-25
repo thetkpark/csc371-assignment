@@ -74,80 +74,75 @@ Total communication time of each message = communication time of message type + 
 
 We come up with 3 test cases.
 
-1. There is no message in buffer
-   
-     ![test-case-1.png](https://drive.google.com/uc?export=view&id=1NH98u6nr3ih1ck0FNkigxMRe0ZuykLtr)
-     
-    ![test-case-1-duration.png](https://drive.google.com/uc?export=view&id=1yarum4UxEs5HhXpjKI_eyHJ8VYw6RoX-)
-    
-     | Type | Message | Waiting time before<br />send next message | Communication<br />Time |
-     | ---- | ------- | ------------------------------------------ | ----------------------- |
-     | Text1  | 1     |  3 Second                                        | 1 second + random time |
-     | Text | 2 | 4 Second | 1 second + random time |
-     | Image | 1 | 4 Second | 5 second + random time |
-     | Image | 2 | 5 Second | 5 second + random time |
-     | Video | 1 | 4 Second | 10 second + random time |
+## 1. There is no message in buffer
+
+![test-case-1.png](https://drive.google.com/uc?export=view&id=1NH98u6nr3ih1ck0FNkigxMRe0ZuykLtr)
+
+![test-case-1-duration.png](https://drive.google.com/uc?export=view&id=1yarum4UxEs5HhXpjKI_eyHJ8VYw6RoX-)
+
+| Type | Message | Waiting time before<br />sending next message | Communication<br />Time |
+| ---- | ------- | ------------------------------------------ | ----------------------- |
+| Text1  | 1     |  3 Second                                        | 1 second + random time |
+| Text | 2 | 4 Second | 1 second + random time |
+| Image | 1 | 3 Second | 5 second + random time |
+| Image | 2 | 4 Second | 5 second + random time |
+| Video | 1 |                                               | 10 second + random time |
+
+## 2. There is one message in buffer
+
+![test-case-2.png](https://drive.google.com/uc?export=view&id=1FZqgyf6X11sT7zXsS-rzC0WLHc87Im_7)
+
+![test-case-2-duration.png](https://drive.google.com/uc?export=view&id=1c0O2gp2awdeXXeYVyjV9LPf7KLPtoj9c)
 
 
-2. There is one message in buffer
+| Type  | Message | Waiting time before<br />sending next message | Communication<br />Time |
+| ----- | ------- | --------------------------------------------- | ----------------------- |
+| Video | 1       | 15 Second                                     | 10 second + random time |
+| Text  | 1       | 8 Second                                      | 1 second + random time  |
+| Image | 1       | 16 Second                                     | 5 second + random time  |
+| Video | 2       | 3 Second                                      | 10 second + random time |
+| Image | 2       |                                               | 5 second + random time  |
 
-   - Sender send five message in this order
-     
-     ![test-case-2.png](https://drive.google.com/uc?export=view&id=1FZqgyf6X11sT7zXsS-rzC0WLHc87Im_7)
+## 3. There are many messages in buffer
 
-     ![test-case-2-duration.png](https://drive.google.com/uc?export=view&id=1c0O2gp2awdeXXeYVyjV9LPf7KLPtoj9c)
+- Input: sender send five messgaes in the following order
 
-     
-     | Type  | Message | Waiting time before<br />send next message | Communication<br />Time |
-     | ----- | ------- | ------------------------------------------ | ----------------------- |
-     | Video | 1       | 2 Second                                   | 10 second + random time |
-     | Text  | 1       | 15 Second                                  | 1 second + random time  |
-     | Image | 1       | 3 Second                                   | 5 second + random time  |
-     | Video | 2       | 11 Second                                  | 10 second + random time |
-     | Image | 2       | 2 Second                                   | 5 second + random time  |
-     
-     
+  ![test-case-3-input.png](https://drive.google.com/uc?export=view&id=1DpY2wnb-UpgAmi4_Z1yGmcwuWbqOS3o9)
 
-3. There are many messages in buffer
+  
 
-   - Input: sender send five messgaes in the following order
+  ![test-case-3-messages.png](https://drive.google.com/uc?export=view&id=1PhBB5VDpe5nzyJJ6Ywutr8zgcCXsjmbX)
+  
+  | Type  | Message | Waiting time before<br />sending next message / end | Communication<br />Time  |
+  | ----- | ------- | --------------------------------------------------- | ------------------------ |
+  | Text  | 1       | 2 seconds                                           | 1 second + random time   |
+  | Text  | 2       | 2 seconds                                           | 1 second + random time   |
+  | Video | 3       | 2 seconds                                           | 10 seconds + random time |
+  | Image | 4       | 2 seconds                                           | 5 seconds + random time  |
+  | Text  | 5       | 2 seconds                                           | 1 second + random time   |
 
-     ![test-case-3-input.png](https://drive.google.com/uc?export=view&id=1DpY2wnb-UpgAmi4_Z1yGmcwuWbqOS3o9)
-
-     
-
-     ![test-case-3-messages.png](https://drive.google.com/uc?export=view&id=1PhBB5VDpe5nzyJJ6Ywutr8zgcCXsjmbX)
-     
-     | Type  | Message | Waiting time before<br />send next message / end | Communication<br />Time  |
-     | ----- | ------- | ------------------------------------------------ | ------------------------ |
-     | Text  | 1       | 2 seconds                                        | 1 second + random time   |
-     | Text  | 2       | 2 seconds                                        | 1 second + random time   |
-     | Video | 3       | 2 seconds                                        | 10 seconds + random time |
-     | Image | 4       | 2 seconds                                        | 5 seconds + random time  |
-     | Text  | 5       | 2 seconds                                        | 1 second + random time   |
-
-     
-     
+  
+  
 
 # Simulation results
 
-These are result of the test scenarios
+These are the result of the test scenarios
 
-1. There is no message in buffer
-  ![main-test-case-1.png](https://drive.google.com/uc?export=view&id=1T-sX7M7i5985wIJDViXlihomGnvvIqWg)
+## 1. There is no message in buffer
+![main-test-case-1.png](https://drive.google.com/uc?export=view&id=1T-sX7M7i5985wIJDViXlihomGnvvIqWg)
 
 
 Main Thread send the message following by the order to the sequencer.
 
 ![sequence-test-case-1.png](https://drive.google.com/uc?export=view&id=1OhN7Zys3YFexTWrAxwX7A4uiGS9LMYVl)
 
-​	Sequencer will receiver message from main thread in the order. Each time of sequencer recieve the message, it will sent the message to all user (Each message will have different timestamp from the communication time that haver random number).
+Sequencer will receiver message from main thread in the order. Each time of sequencer receive the message, it will sent the message to all user with delay in communication time.
 
 ![result-test-case-1.png](https://drive.google.com/uc?export=view&id=1tro6R0pHqK1J0RuW9EOcfzyGd-pgcfI1)
 
-From the result in this scenario, it didn't have any buffer. So, it will recieve all the message in respectively.
+From the result in this scenario, they didn't have any message in buffer. So, it will display all the message in the order that they received.
 
-2. There is one message in buffer
+## 2. There is one message in buffer
 
 ![main-test-case-2.png](https://drive.google.com/uc?export=view&id=1Bozy0WubVFlIDZZOqIPvq8eNTnPw7Hcb)
 
@@ -155,42 +150,39 @@ Main Thread send the message following by the order to the sequencer.
 
 ![sequence-test-case-2.png](https://drive.google.com/uc?export=view&id=1nja5WdQAxlovFXZmIUpVIS1j4RUXaQqE)
 
-​	Sequencer will receiver message from main thread in the order. Each time of sequencer recieve the message, it will sent the message to all user (Each message will have different timestamp from the communication time that haver random number).
+​	Sequencer will receiver message from main thread in the order. Each time of sequencer receive the message, it will sent the message to all user with delay in communication time.
 
 ![resulte-test-case-2.png](https://drive.google.com/uc?export=view&id=1LXw1MnmWerBGv_j49gZzQ8K8WQLuiz3o)
 
-From the result in this scenarios, User1 recieve the Video1 and Text 1 in order with no buffer. This situation happend by the text message (15 second) had duration more than Video (12 second) to sent the message in order. Then User1 will recieve image1 and image2 but image2 was wrong sequence number, so User1 will waiting to get Video2 and adding image 2 to buffer. Then, User1 will receive Video2  and go into the buffer to display the image 2.
+From the result in this scenarios, User1 receive the Video1 and Text 1 in order with no buffer. This situation happened by the text message (15 second) had duration more than Video (12 second) to sent the message in order. Then User1 will receive image1 and image2 but image2 was wrong sequence number, so User1 will waiting to get Video2 and add the image 2 to buffer. Then, User1 will receive Video2  and go into the buffer to display the image 2.
 
 User2 have same order the message with User1.
 
 User3 have same order the message with User1. 
 
+## There are many messages in buffer
 
-3. There are many messages in buffer
+![test-case-3-sequencer.png](https://drive.google.com/uc?export=view&id=18e1Nf2DLaLeK2EQLUGwFjs-0OFmxp70t)
 
-   ![test-case-3-sequencer.png](https://drive.google.com/uc?export=view&id=18e1Nf2DLaLeK2EQLUGwFjs-0OFmxp70t)
-
-   Sequencer receives messages from main thread in the order that message was sent. Each time sequence receive the message, it will send message to all users (one message might reach users in the different time due to the random communication time).
-
-   
-
-   ![test-case-3-user-1.png](https://drive.google.com/uc?export=view&id=1tLsXUw5m74C6H8DGuYczfmWGuWFz7bw2)
-
-   User1 receive and display message 1, and 2 respectively. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
-
-   
-
-   ![test-case-3-user-2.png](https://drive.google.com/uc?export=view&id=1HmNWPCNANVio8rH-Glh8L8GdiWgckEBK)
-
-   User2 receive an display message 1, and 2 respectively. After that it receives message 5 which sequence number is 5 but the sequence of user2 is 2. So message5 will be put int buffer. Then user2 receive message3 (sequence = 3), and sequence of user2 is 2. So message3 can be displayed. After that user2 iterate all messages in buffer which contains message5 (seq = 5 ) but it cannot be displayed because seq of user2 is 3 and 3+1 != 5. After that user2 receive and display message4 because 3+1 = 4. Finally, user2 iterate all messages in buffer and can display message5 because 4+1 = 5.
+Sequencer receives messages from main thread in the order that message was sent. Each time sequence receive the message, it will send message to all users (one message might reach users in the different time due to the random communication time).
 
 
 
-​	![test-case-3-user-3.png](https://drive.google.com/uc?export=view&id=1BT_0iMIFCFF_fuO8tebr7ofoLgFN_PhQ)
+![test-case-3-user-1.png](https://drive.google.com/uc?export=view&id=1tLsXUw5m74C6H8DGuYczfmWGuWFz7bw2)
 
-​		The order of messages that user3 receive is same as user1.
+User1 receive and display message 1, and 2 respectively. After that it receive message 4, 5 but the sequence number that user1 is waiting for is 3. So message 4, 5 must be stored in the buffer. Then user1 receive message3 that they are waiting for, so it can display this message. After that they go into buffer and display message 4, and 5 respectively.
 
 
+
+![test-case-3-user-2.png](https://drive.google.com/uc?export=view&id=1HmNWPCNANVio8rH-Glh8L8GdiWgckEBK)
+
+User2 receive an display message 1, and 2 respectively. After that it receives message 5 which sequence number is 5 but the sequence of user2 is 2. So message5 will be put int buffer. Then user2 receive message3 (sequence = 3), and sequence of user2 is 2. So message3 can be displayed. After that user2 iterate all messages in buffer which contains message5 (seq = 5 ) but it cannot be displayed because seq of user2 is 3 and 3+1 != 5. After that user2 receive and display message4 because 3+1 = 4. Finally, user2 iterate all messages in buffer and can display message5 because 4+1 = 5.
+
+
+
+![test-case-3-user-3.png](https://drive.google.com/uc?export=view&id=1BT_0iMIFCFF_fuO8tebr7ofoLgFN_PhQ)
+
+The order of messages that user3 receive is same as user1.
 
 # User manuals
 
@@ -198,16 +190,11 @@ All you need to do is just install Go by accessing link below
 
 https://golang.org/doc/install
 
-After complete the installation, please close the current terminal or command line and open new one.
+After complete the installation, change directory to the project directory and use go run command to run the simulator
 
-Then change directory to the project directory and use go run command to run simulator
-
-```
-cd dline/go
+```sh
 go run main.go
 ```
-
-
 
 # Team Members
 
