@@ -33,7 +33,13 @@ public class Main {
         return transactions;
     }
 
+    public static void printMachineInfo() {
+        System.out.println("Available processors (thread): " + Runtime.getRuntime().availableProcessors());
+        System.out.println("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
+    }
+
     public static void main(String[] args) throws IOException, CsvValidationException {
+        printMachineInfo();
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
         runTask(transactions, Main::Task1Serialize, "Task 1 Serialize");
         runTask(transactions, Main::Task1Parallel, "Task 1 Parallel");
