@@ -5,7 +5,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -23,6 +26,13 @@ public class Main {
 
     public static void main(String[] args) throws IOException, CsvValidationException {
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
+        List<Transaction> txs = transactions.stream()
+                .filter((Transaction t) -> t.getBalance() == 0)
+                .collect(Collectors.groupingBy(Transaction::getDescription))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toList())
+
     }
 
 }
