@@ -43,6 +43,8 @@ public class Main {
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
         runTask(transactions, Main::Task1Serialize, "Task 1 Serialize");
         runTask(transactions, Main::Task1Parallel, "Task 1 Parallel");
+        runTask(transactions, Main::Task2Serialize, "Task 2 Serialize");
+        runTask(transactions, Main::Task2Parallel, "Task 2 Parallel");
     }
 
     public static void runTask(ArrayList<Transaction> txs, Task task, String taskName) {
@@ -70,6 +72,14 @@ public class Main {
                 .parallelStream()
                 .map((i) -> i.get(0))
                 .forEach(tx -> System.out.println(tx.toString()));
+    }
+
+    public static void Task2Serialize(ArrayList<Transaction> transactions) {
+
+    }
+
+    public static void Task2Parallel(ArrayList<Transaction> transactions) {
+
     }
 
 }
