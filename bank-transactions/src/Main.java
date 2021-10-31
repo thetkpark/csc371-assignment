@@ -77,11 +77,27 @@ public class Main {
     public static void Task2Serialize(ArrayList<Transaction> transactions) {
         transactions.stream()
                 .collect(Collectors.groupingBy(Transaction::getMonthYear))
-                .
+                .forEach((key, value) -> {
+                    Transaction firstTx = value.get(0);
+                    float sum = firstTx.getBalance() + firstTx.getWithdrawl() - firstTx.getDeposit();
+                    sum += value.stream()
+                            .map(Transaction::sumDepositWithdrawl)
+                            .reduce(0f, Float::sum);
+                    System.out.println(key + ": " + sum);
+                });
     }
 
     public static void Task2Parallel(ArrayList<Transaction> transactions) {
-
+        transactions.parallelStream()
+                .collect(Collectors.groupingBy(Transaction::getMonthYear))
+                .forEach((key, value) -> {
+                    Transaction firstTx = value.get(0);
+                    float sum = firstTx.getBalance() + firstTx.getWithdrawl() - firstTx.getDeposit(); // Get initial balance
+                    sum += value.parallelStream()
+                            .map(Transaction::sumDepositWithdrawl)
+                            .reduce(0f, Float::sum);
+                    System.out.println(key + ": " + sum);
+                });
     }
 
 }

@@ -81,4 +81,8 @@ public class Transaction {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-yyyy");
         return this.date.format(formatter);
     }
+
+    public float sumDepositWithdrawl() {
+        return this.deposit - this.withdrawl;
+    }
 }
