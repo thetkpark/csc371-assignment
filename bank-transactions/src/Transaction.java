@@ -76,4 +76,9 @@ public class Transaction {
                 ", balance=" + balance +
                 '}';
     }
+
+    public String getMonthYear() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-yyyy");
+        return this.date.format(formatter);
+    }
 }

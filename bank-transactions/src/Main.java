@@ -75,7 +75,9 @@ public class Main {
     }
 
     public static void Task2Serialize(ArrayList<Transaction> transactions) {
-
+        transactions.stream()
+                .collect(Collectors.groupingBy(Transaction::getMonthYear))
+                .
     }
 
     public static void Task2Parallel(ArrayList<Transaction> transactions) {
