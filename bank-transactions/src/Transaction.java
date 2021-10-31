@@ -65,4 +65,15 @@ public class Transaction {
     public void setBalance(float balance) {
         this.balance = balance;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "date=" + date +
+                ", description='" + description + '\'' +
+                ", deposit=" + deposit +
+                ", withdrawl=" + withdrawl +
+                ", balance=" + balance +
+                '}';
+    }
 }

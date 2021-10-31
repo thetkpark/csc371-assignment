@@ -6,8 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -26,13 +30,35 @@ public class Main {
 
     public static void main(String[] args) throws IOException, CsvValidationException {
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
-        List<Transaction> txs = transactions.stream()
+        LocalDateTime tsStart = LocalDateTime.now();
+        Task1Serialize(transactions);
+        LocalDateTime tsFinish = LocalDateTime.now();
+        System.out.println("Task 1 Serialize: " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
+
+        tsStart = LocalDateTime.now();
+        Task1Serialize(transactions);
+        tsFinish = LocalDateTime.now();
+        System.out.println("Task 1 Parallel: " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
+    }
+
+    public static void Task1Serialize(ArrayList<Transaction> transactions) {
+        transactions.stream()
                 .filter((Transaction t) -> t.getBalance() == 0)
                 .collect(Collectors.groupingBy(Transaction::getDescription))
-                .entrySet()
+                .values()
                 .stream()
-                .collect(Collectors.toList())
+                .map((i) -> i.get(0))
+                .forEach(tx -> System.out.println(tx.toString()));
+    }
 
+    public static void Task1Parallel(ArrayList<Transaction> transactions) {
+        transactions.parallelStream()
+                .filter((Transaction t) -> t.getBalance() == 0)
+                .collect(Collectors.groupingBy(Transaction::getDescription))
+                .values()
+                .parallelStream()
+                .map((i) -> i.get(0))
+                .forEach(tx -> System.out.println(tx.toString()));
     }
 
 }
