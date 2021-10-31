@@ -12,7 +12,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+ interface Task {
+    void run(ArrayList<Transaction> transactions);
+}
 
 public class Main {
 
@@ -30,15 +35,15 @@ public class Main {
 
     public static void main(String[] args) throws IOException, CsvValidationException {
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
-        LocalDateTime tsStart = LocalDateTime.now();
-        Task1Serialize(transactions);
-        LocalDateTime tsFinish = LocalDateTime.now();
-        System.out.println("Task 1 Serialize: " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
+        runTask(transactions, Main::Task1Serialize, "Task 1 Serialize");
+        runTask(transactions, Main::Task1Parallel, "Task 1 Parallel");
+    }
 
-        tsStart = LocalDateTime.now();
-        Task1Serialize(transactions);
-        tsFinish = LocalDateTime.now();
-        System.out.println("Task 1 Parallel: " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
+    public static void runTask(ArrayList<Transaction> txs, Task task, String taskName) {
+        LocalDateTime tsStart = LocalDateTime.now();
+        task.run(txs);
+        LocalDateTime tsFinish = LocalDateTime.now();
+        System.out.println(taskName + ": " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
     }
 
     public static void Task1Serialize(ArrayList<Transaction> transactions) {
