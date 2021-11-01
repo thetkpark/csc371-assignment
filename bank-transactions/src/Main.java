@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
  interface Task {
-    void run(ArrayList<Transaction> transactions);
+    void run(ArrayList<Transaction> transactions, boolean print);
 }
 
 public class Main {
@@ -41,40 +41,56 @@ public class Main {
     public static void main(String[] args) throws IOException, CsvValidationException {
         printMachineInfo();
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
-        runTask(transactions, Main::Task1Serialize, "Task 1 Serialize");
-        runTask(transactions, Main::Task1Parallel, "Task 1 Parallel");
-        runTask(transactions, Main::Task2Serialize, "Task 2 Serialize");
-        runTask(transactions, Main::Task2Parallel, "Task 2 Parallel");
+        runTask(transactions, false, Main::Task1Serialize, "Task 1 Serialize");
+        runTask(transactions, false, Main::Task1Parallel, "Task 1 Parallel");
+        runTask(transactions, false, Main::Task2Serialize, "Task 2 Serialize");
+        runTask(transactions, false, Main::Task2Parallel, "Task 2 Parallel");
+
+//        System.out.println("");
+//        transactions = readFromCSV("5000000-BT-Records.csv");
+//        runTask(transactions, false, Main::Task1Serialize, "Task 1 Serialize");
+//        runTask(transactions, false, Main::Task1Parallel, "Task 1 Parallel");
+//        runTask(transactions, false, Main::Task2Serialize, "Task 2 Serialize");
+//        runTask(transactions, false, Main::Task2Parallel, "Task 2 Parallel");
     }
 
-    public static void runTask(ArrayList<Transaction> txs, Task task, String taskName) {
-        LocalDateTime tsStart = LocalDateTime.now();
-        task.run(txs);
-        LocalDateTime tsFinish = LocalDateTime.now();
-        System.out.println(taskName + ": " + Duration.between(tsStart, tsFinish).toMillis() + " ms");
+    public static void runTask(ArrayList<Transaction> txs, boolean print, Task task, String taskName) {
+        int n = 3;
+        long totalTimeMs = 0;
+        for (int i=0; i<n; i++) {
+            LocalDateTime tsStart = LocalDateTime.now();
+            task.run(txs, print);
+            LocalDateTime tsFinish = LocalDateTime.now();
+            totalTimeMs += Duration.between(tsStart, tsFinish).toMillis();
+        }
+        System.out.println(taskName + ": " + totalTimeMs/3 + " ms");
     }
 
-    public static void Task1Serialize(ArrayList<Transaction> transactions) {
+    public static void Task1Serialize(ArrayList<Transaction> transactions, boolean print) {
         transactions.stream()
                 .filter((Transaction t) -> t.getBalance() == 0)
                 .collect(Collectors.groupingBy(Transaction::getDescription))
                 .values()
                 .stream()
                 .map((i) -> i.get(0))
-                .forEach(tx -> System.out.println(tx.toString()));
+                .forEach(tx -> {
+                    if (print) System.out.println(tx.toString());
+                });
     }
 
-    public static void Task1Parallel(ArrayList<Transaction> transactions) {
+    public static void Task1Parallel(ArrayList<Transaction> transactions, boolean print) {
         transactions.parallelStream()
                 .filter((Transaction t) -> t.getBalance() == 0)
                 .collect(Collectors.groupingBy(Transaction::getDescription))
                 .values()
                 .parallelStream()
                 .map((i) -> i.get(0))
-                .forEach(tx -> System.out.println(tx.toString()));
+                .forEach(tx -> {
+                    if (print) System.out.println(tx.toString());
+                });
     }
 
-    public static void Task2Serialize(ArrayList<Transaction> transactions) {
+    public static void Task2Serialize(ArrayList<Transaction> transactions, boolean print) {
         transactions.stream()
                 .collect(Collectors.groupingBy(Transaction::getMonthYear))
                 .forEach((key, value) -> {
@@ -83,11 +99,11 @@ public class Main {
                     sum += value.stream()
                             .map(Transaction::sumDepositWithdrawl)
                             .reduce(0f, Float::sum);
-                    System.out.println(key + ": " + sum);
+                    if (print) System.out.println(key + ": " + sum);
                 });
     }
 
-    public static void Task2Parallel(ArrayList<Transaction> transactions) {
+    public static void Task2Parallel(ArrayList<Transaction> transactions, boolean print) {
         transactions.parallelStream()
                 .collect(Collectors.groupingBy(Transaction::getMonthYear))
                 .forEach((key, value) -> {
@@ -96,7 +112,7 @@ public class Main {
                     sum += value.parallelStream()
                             .map(Transaction::sumDepositWithdrawl)
                             .reduce(0f, Float::sum);
-                    System.out.println(key + ": " + sum);
+                    if (print) System.out.println(key + ": " + sum);
                 });
     }
 
