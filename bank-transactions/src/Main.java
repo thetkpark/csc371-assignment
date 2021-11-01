@@ -41,10 +41,13 @@ public class Main {
     public static void main(String[] args) throws IOException, CsvValidationException {
         printMachineInfo();
         ArrayList<Transaction>  transactions = readFromCSV("5000-BT-Records.csv");
-        runTask(transactions, false, Main::Task1Serialize, "Task 1 Serialize");
-        runTask(transactions, false, Main::Task1Parallel, "Task 1 Parallel");
-        runTask(transactions, false, Main::Task2Serialize, "Task 2 Serialize");
-        runTask(transactions, false, Main::Task2Parallel, "Task 2 Parallel");
+        long task1Serial = runTask(transactions, false, Main::Task1Serialize);
+        long task1Parallel = runTask(transactions, false, Main::Task1Parallel);
+        long task2Serial = runTask(transactions, false, Main::Task2Serialize);
+        long task2Parallel = runTask(transactions, false, Main::Task2Parallel);
+
+        printSpeedupAndEfficiency(task1Serial, task1Parallel, "Task 1");
+        printSpeedupAndEfficiency(task2Serial, task2Parallel, "Task 2");
 
 //        System.out.println("");
 //        transactions = readFromCSV("5000000-BT-Records.csv");
@@ -54,7 +57,7 @@ public class Main {
 //        runTask(transactions, false, Main::Task2Parallel, "Task 2 Parallel");
     }
 
-    public static void runTask(ArrayList<Transaction> txs, boolean print, Task task, String taskName) {
+    public static long runTask(ArrayList<Transaction> txs, boolean print, Task task) {
         int n = 3;
         long totalTimeMs = 0;
         for (int i=0; i<n; i++) {
@@ -63,7 +66,14 @@ public class Main {
             LocalDateTime tsFinish = LocalDateTime.now();
             totalTimeMs += Duration.between(tsStart, tsFinish).toMillis();
         }
-        System.out.println(taskName + ": " + totalTimeMs/3 + " ms");
+        return totalTimeMs/3;
+    }
+
+    public static void printSpeedupAndEfficiency(long tSerial, long tParallel, String taskName) {
+        float speedup = tSerial/tParallel;
+        float efficiency = speedup / Runtime.getRuntime().availableProcessors() / 2;
+        System.out.println(taskName + ": Serial " + tSerial + " ms, Parallel " + tParallel + " ms");
+        System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency);
     }
 
     public static void Task1Serialize(ArrayList<Transaction> transactions, boolean print) {
