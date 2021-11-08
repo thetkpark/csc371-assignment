@@ -43,31 +43,31 @@ public class Main {
         ArrayList<Transaction> transactions = readFromCSV("5000-BT-Records.csv");
         long task1Serial = runTask(transactions, false, Main::Task1Serialize);
         long task1Parallel = runTask(transactions, false, Main::Task1Parallel);
+        printSpeedupAndEfficiency(task1Serial, task1Parallel, "Task 1");
 
         long task21Serial = runTask(transactions, false, Main::Task21Serialize);
         long task21Parallel = runTask(transactions, false, Main::Task21Parallel);
-
-        long task22Serial = runTask(transactions, false, Main::Task22Serialize);
-        long task22Parallel = runTask(transactions, false, Main::Task22Parallel);
-
-        printSpeedupAndEfficiency(task1Serial, task1Parallel, "Task 1");
         printSpeedupAndEfficiency(task21Serial, task21Parallel, "Task 2.1");
-        printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
+
+//        long task22Serial = runTask(transactions, false, Main::Task22Serialize);
+//        long task22Parallel = runTask(transactions, false, Main::Task22Parallel);
+
+//        printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
 
         // For large dataset
-        // ArrayList<Transaction> transactions = readFromCSV("5000000-BT-Records.csv");
-        // long task1Serial = runTask(transactions, false, Main::Task1Serialize);
-        // long task1Parallel = runTask(transactions, false, Main::Task1Parallel);
+         ArrayList<Transaction> transactionsLarge = readFromCSV("5000000-BT-Records.csv");
+         long task1SerialLarge = runTask(transactionsLarge, false, Main::Task1Serialize);
+         long task1ParallelLarge = runTask(transactionsLarge, false, Main::Task1Parallel);
+        printSpeedupAndEfficiency(task1SerialLarge, task1ParallelLarge, "Large Task 1");
 
-        // long task21Serial = runTask(transactions, false, Main::Task21Serialize);
-        // long task21Parallel = runTask(transactions, false, Main::Task21Parallel);
+         long task21SerialLarge = runTask(transactionsLarge, false, Main::Task21Serialize);
+         long task21ParallelLarge = runTask(transactionsLarge, false, Main::Task21Parallel);
+        printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task 2.1");
 
-        // long task22Serial = runTask(transactions, false, Main::Task22Serialize);
-        // long task22Parallel = runTask(transactions, false, Main::Task22Parallel);
+//       long task22Serial = runTask(transactions, false, Main::Task22Serialize);
+//       long task22Parallel = runTask(transactions, false, Main::Task22Parallel);
 
-        // printSpeedupAndEfficiency(task1Serial, task1Parallel, "Task 1");
-        // printSpeedupAndEfficiency(task21Serial, task21Parallel, "Task 2.1");
-        // printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
+//       printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
     }
 
     public static long runTask(ArrayList<Transaction> txs, boolean print, Task task) {
@@ -77,16 +77,22 @@ public class Main {
             LocalDateTime tsStart = LocalDateTime.now();
             task.run(txs, print);
             LocalDateTime tsFinish = LocalDateTime.now();
-            totalTimeMs += Duration.between(tsStart, tsFinish).toMillis();
+            totalTimeMs += Duration.between(tsStart, tsFinish).toNanos();
         }
         return totalTimeMs / 3;
     }
 
     public static void printSpeedupAndEfficiency(long tSerial, long tParallel, String taskName) {
-        float speedup = tSerial / tParallel;
-        float efficiency = speedup / Runtime.getRuntime().availableProcessors() / 2;
-        System.out.println(taskName + ": Serial " + tSerial + " ms, Parallel " + tParallel + " ms");
-        System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency);
+        double tSerialMs = roundToTwoDecimal(tSerial/1000000.0);
+        double tParallelMs = roundToTwoDecimal(tParallel/1000000.0);
+        double speedup = roundToTwoDecimal((double) tSerial/tParallel);
+        double efficiency = roundToTwoDecimal(speedup / Runtime.getRuntime().availableProcessors() / 2.0);
+        System.out.println(taskName + ": Serial " + tSerialMs + " ms, Parallel " + tParallelMs + " ms");
+        System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency*100 + " %");
+    }
+
+    public static double roundToTwoDecimal(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
     public static void Task1Serialize(ArrayList<Transaction> transactions, boolean print) {
