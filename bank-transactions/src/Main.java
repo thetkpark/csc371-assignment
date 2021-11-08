@@ -86,7 +86,7 @@ public class Main {
         double tSerialMs = roundToTwoDecimal(tSerial/1000000.0);
         double tParallelMs = roundToTwoDecimal(tParallel/1000000.0);
         double speedup = roundToTwoDecimal((double) tSerial/tParallel);
-        double efficiency = roundToTwoDecimal(speedup / Runtime.getRuntime().availableProcessors() / 2.0);
+        double efficiency = roundToTwoDecimal(speedup /  4);
         System.out.println(taskName + ": Serial " + tSerialMs + " ms, Parallel " + tParallelMs + " ms");
         System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency*100 + " %");
     }
