@@ -66,8 +66,8 @@ public class Main {
          long task21ParallelLarge = runParallelTask(transactionsLarge, false, Main::Task21Parallel);
         printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task 2.1");
 
-       long task22SerialLarge = runSerialTask(transactions, false, Main::Task22Serialize);
-       long task22ParallelLarge = runParallelTask(transactions, false, Main::Task22Parallel);
+       long task22SerialLarge = runSerialTask(transactionsLarge, false, Main::Task22Serialize);
+       long task22ParallelLarge = runParallelTask(transactionsLarge, false, Main::Task22Parallel);
        printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task 2.2");
     }
 
@@ -79,11 +79,15 @@ public class Main {
     }
 
     public static long runParallelTask(ArrayList<Transaction> txs, boolean print, Task task) {
-        ForkJoinPool pool = new ForkJoinPool(threads);
+//        ForkJoinPool pool = new ForkJoinPool(threads);
+//        LocalDateTime tsStart = LocalDateTime.now();
+//        pool.submit(() -> task.run(txs, print));
+//        LocalDateTime tsFinish = LocalDateTime.now();
+//        pool.shutdownNow();
+//        return Duration.between(tsStart, tsFinish).toNanos();
         LocalDateTime tsStart = LocalDateTime.now();
-        pool.submit(() -> task.run(txs, print));
+        task.run(txs, print);
         LocalDateTime tsFinish = LocalDateTime.now();
-        pool.shutdownNow();
         return Duration.between(tsStart, tsFinish).toNanos();
     }
 
@@ -93,7 +97,7 @@ public class Main {
         double speedup = roundToTwoDecimal((double) tSerial/tParallel);
         double efficiency = roundToTwoDecimal(speedup /  threads);
         System.out.println(taskName + ": Serial " + tSerialMs + " ms, Parallel " + tParallelMs + " ms");
-        System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency*100 + " %");
+        System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency);
     }
 
     public static double roundToTwoDecimal(double value) {
