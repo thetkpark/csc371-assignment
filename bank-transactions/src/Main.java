@@ -57,18 +57,18 @@ public class Main {
         printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
 
         // For large dataset
-         ArrayList<Transaction> transactionsLarge = readFromCSV("5000000-BT-Records.csv");
-         long task1SerialLarge = runTask(transactionsLarge, false, Main::Task1Serialize);
-         long task1ParallelLarge = runTask(transactionsLarge, false, Main::Task1Parallel);
+        ArrayList<Transaction> transactionsLarge = readFromCSV("5000000-BT-Records.csv");
+        long task1SerialLarge = runTask(transactionsLarge, false, Main::Task1Serialize);
+        long task1ParallelLarge = runTask(transactionsLarge, false, Main::Task1Parallel);
         printSpeedupAndEfficiency(task1SerialLarge, task1ParallelLarge, "Large Task 1");
 
-         long task21SerialLarge = runTask(transactionsLarge, false, Main::Task21Serialize);
-         long task21ParallelLarge = runTask(transactionsLarge, false, Main::Task21Parallel);
+        long task21SerialLarge = runTask(transactionsLarge, false, Main::Task21Serialize);
+        long task21ParallelLarge = runTask(transactionsLarge, false, Main::Task21Parallel);
         printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task 2.1");
 
-       long task22SerialLarge = runTask(transactionsLarge, false, Main::Task22Serialize);
-       long task22ParallelLarge = runTask(transactionsLarge, false, Main::Task22Parallel);
-       printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task 2.2");
+        long task22SerialLarge = runTask(transactionsLarge, false, Main::Task22Serialize);
+        long task22ParallelLarge = runTask(transactionsLarge, false, Main::Task22Parallel);
+        printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task 2.2");
     }
 
     public static long runTask(ArrayList<Transaction> txs, boolean print, Task task) {
@@ -79,10 +79,10 @@ public class Main {
     }
 
     public static void printSpeedupAndEfficiency(long tSerial, long tParallel, String taskName) {
-        double tSerialMs = roundToTwoDecimal(tSerial/1000000.0);
-        double tParallelMs = roundToTwoDecimal(tParallel/1000000.0);
-        double speedup = roundToTwoDecimal((double) tSerial/tParallel);
-        double efficiency = roundToTwoDecimal(speedup /  threads);
+        double tSerialMs = roundToTwoDecimal(tSerial / 1000000.0);
+        double tParallelMs = roundToTwoDecimal(tParallel / 1000000.0);
+        double speedup = roundToTwoDecimal((double) tSerial / tParallel);
+        double efficiency = roundToTwoDecimal(speedup / threads);
         System.out.println(taskName + ": Serial " + tSerialMs + " ms, Parallel " + tParallelMs + " ms");
         System.out.println("Speedup: " + speedup + "\tEfficiency: " + efficiency);
     }
@@ -143,7 +143,7 @@ public class Main {
                 .forEach((key, value) -> {
                     Transaction firstTx = value.get(0);
                     float sum = firstTx.getBalance() + firstTx.getWithdrawl() - firstTx.getDeposit(); // Get initial
-                                                                                                      // balance
+                    // balance
                     sum += value.parallelStream().map(Transaction::sumDepositWithdrawl).reduce(0f, Float::sum);
                     if (print)
                         System.out.println(key + ": " + sum);
