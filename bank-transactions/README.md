@@ -56,7 +56,7 @@ Main function is the entry point of the application. First, it called `readFromC
 
 ## Task 1
 
-
+First, we transform the input data source into stream by using `.stream()` and `parallelStream()`. Then, we used `.filter((Transaction t) -> t.getBalance() == 0)` to filter only transaction that made account balance equal to 0. After that, the results are collected with `.collect()` and grouped by their description. At this point, we have Map of String, the description, and List of Transaction objects. Therefore, we transform the values of Map (List of Transaction objects) into the stream again. Then, we used `.map()` to get only the first Transaction from each description. Since the ArrayList has encountered order, the results that we get is the first transaction of each description that made the balance equal to 0. In the end, we used `.forEach()` to print out the result to the console.
 
 ### Result
 > Task 1: Serial 15.62 ms, Parallel 15.63 ms
