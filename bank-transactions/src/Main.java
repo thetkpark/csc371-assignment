@@ -98,6 +98,11 @@ public class Main {
                     if (print)
                         System.out.println(tx.toString());
                 });
+//        var groupedTxs = transactions.stream().collect(Collectors.groupingBy(Transaction::getDescription));
+//        groupedTxs.entrySet().stream().forEach((entry) -> {
+//            var tx = entry.getValue().stream().dropWhile((tx)->tx.getBalance() == 0).findFirst();
+//            tx.ifPresent(transaction -> System.out.println(transaction.toString()));
+//        });
     }
 
     public static void Task1Parallel(ArrayList<Transaction> transactions, boolean print) {
