@@ -44,47 +44,34 @@ public class Main {
     public static void main(String[] args) throws IOException, CsvValidationException {
         printMachineInfo();
         ArrayList<Transaction> transactions = readFromCSV("5000-BT-Records.csv");
-        long task1Serial = runSerialTask(transactions, false, Main::Task1Serialize);
-        long task1Parallel = runParallelTask(transactions, false, Main::Task1Parallel);
+        long task1Serial = runTask(transactions, false, Main::Task1Serialize);
+        long task1Parallel = runTask(transactions, false, Main::Task1Parallel);
         printSpeedupAndEfficiency(task1Serial, task1Parallel, "Task 1");
 
-        long task21Serial = runSerialTask(transactions, false, Main::Task21Serialize);
-        long task21Parallel = runParallelTask(transactions, false, Main::Task21Parallel);
+        long task21Serial = runTask(transactions, false, Main::Task21Serialize);
+        long task21Parallel = runTask(transactions, false, Main::Task21Parallel);
         printSpeedupAndEfficiency(task21Serial, task21Parallel, "Task 2.1");
 
-        long task22Serial = runSerialTask(transactions, false, Main::Task22Serialize);
-        long task22Parallel = runParallelTask(transactions, false, Main::Task22Parallel);
+        long task22Serial = runTask(transactions, false, Main::Task22Serialize);
+        long task22Parallel = runTask(transactions, false, Main::Task22Parallel);
         printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
 
         // For large dataset
          ArrayList<Transaction> transactionsLarge = readFromCSV("5000000-BT-Records.csv");
-         long task1SerialLarge = runSerialTask(transactionsLarge, false, Main::Task1Serialize);
-         long task1ParallelLarge = runParallelTask(transactionsLarge, false, Main::Task1Parallel);
+         long task1SerialLarge = runTask(transactionsLarge, false, Main::Task1Serialize);
+         long task1ParallelLarge = runTask(transactionsLarge, false, Main::Task1Parallel);
         printSpeedupAndEfficiency(task1SerialLarge, task1ParallelLarge, "Large Task 1");
 
-         long task21SerialLarge = runSerialTask(transactionsLarge, false, Main::Task21Serialize);
-         long task21ParallelLarge = runParallelTask(transactionsLarge, false, Main::Task21Parallel);
+         long task21SerialLarge = runTask(transactionsLarge, false, Main::Task21Serialize);
+         long task21ParallelLarge = runTask(transactionsLarge, false, Main::Task21Parallel);
         printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task 2.1");
 
-       long task22SerialLarge = runSerialTask(transactionsLarge, false, Main::Task22Serialize);
-       long task22ParallelLarge = runParallelTask(transactionsLarge, false, Main::Task22Parallel);
+       long task22SerialLarge = runTask(transactionsLarge, false, Main::Task22Serialize);
+       long task22ParallelLarge = runTask(transactionsLarge, false, Main::Task22Parallel);
        printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task 2.2");
     }
 
-    public static long runSerialTask(ArrayList<Transaction> txs, boolean print, Task task) {
-        LocalDateTime tsStart = LocalDateTime.now();
-        task.run(txs, print);
-        LocalDateTime tsFinish = LocalDateTime.now();
-        return Duration.between(tsStart, tsFinish).toNanos();
-    }
-
-    public static long runParallelTask(ArrayList<Transaction> txs, boolean print, Task task) {
-//        ForkJoinPool pool = new ForkJoinPool(threads);
-//        LocalDateTime tsStart = LocalDateTime.now();
-//        pool.submit(() -> task.run(txs, print));
-//        LocalDateTime tsFinish = LocalDateTime.now();
-//        pool.shutdownNow();
-//        return Duration.between(tsStart, tsFinish).toNanos();
+    public static long runTask(ArrayList<Transaction> txs, boolean print, Task task) {
         LocalDateTime tsStart = LocalDateTime.now();
         task.run(txs, print);
         LocalDateTime tsFinish = LocalDateTime.now();
