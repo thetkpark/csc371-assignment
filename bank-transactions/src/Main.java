@@ -57,28 +57,18 @@ public class Main {
         printSpeedupAndEfficiency(task22Serial, task22Parallel, "Task 2.2");
 
         // For large dataset
-        // ArrayList<Transaction> transactionsLarge =
-        // readFromCSV("5000000-BT-Records.csv");
-        // long task1SerialLarge = runTask(transactionsLarge, false,
-        // Main::Task1Serialize);
-        // long task1ParallelLarge = runTask(transactionsLarge, false,
-        // Main::Task1Parallel);
-        // printSpeedupAndEfficiency(task1SerialLarge, task1ParallelLarge, "Large Task
-        // 1");
+        ArrayList<Transaction> transactionsLarge = readFromCSV("5000000-BT-Records.csv");
+        long task1SerialLarge = runTask(transactionsLarge, false, Main::Task1Serialize);
+        long task1ParallelLarge = runTask(transactionsLarge, false, Main::Task1Parallel);
+        printSpeedupAndEfficiency(task1SerialLarge, task1ParallelLarge, "Large Task 1");
 
-        // long task21SerialLarge = runTask(transactionsLarge, false,
-        // Main::Task21Serialize);
-        // long task21ParallelLarge = runTask(transactionsLarge, false,
-        // Main::Task21Parallel);
-        // printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task
-        // 2.1");
+        long task21SerialLarge = runTask(transactionsLarge, false, Main::Task21Serialize);
+        long task21ParallelLarge = runTask(transactionsLarge, false, Main::Task21Parallel);
+        printSpeedupAndEfficiency(task21SerialLarge, task21ParallelLarge, "Large Task 2.1");
 
-        // long task22SerialLarge = runTask(transactionsLarge, false,
-        // Main::Task22Serialize);
-        // long task22ParallelLarge = runTask(transactionsLarge, false,
-        // Main::Task22Parallel);
-        // printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task
-        // 2.2");
+        long task22SerialLarge = runTask(transactionsLarge, false, Main::Task22Serialize);
+        long task22ParallelLarge = runTask(transactionsLarge, false, Main::Task22Parallel);
+        printSpeedupAndEfficiency(task22SerialLarge, task22ParallelLarge, "Large Task 2.2");
     }
 
     public static long runTask(ArrayList<Transaction> txs, boolean print, Task task) {
@@ -108,13 +98,6 @@ public class Main {
                     if (print)
                         System.out.println(tx.toString());
                 });
-        // var groupedTxs =
-        // transactions.stream().collect(Collectors.groupingBy(Transaction::getDescription));
-        // groupedTxs.entrySet().stream().forEach((entry) -> {
-        // var tx = entry.getValue().stream().dropWhile((tx)->tx.getBalance() ==
-        // 0).findFirst();
-        // tx.ifPresent(transaction -> System.out.println(transaction.toString()));
-        // });
     }
 
     public static void Task1Parallel(ArrayList<Transaction> transactions, boolean print) {
