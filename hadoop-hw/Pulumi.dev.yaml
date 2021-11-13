@@ -1,0 +1,2 @@
+config:
+  gcp:project: csc371-hadoop-hw
