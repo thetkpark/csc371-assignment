@@ -8,8 +8,8 @@ import * as gcp from "@pulumi/gcp";
 // export const bucketName = bucket.url;
 
 // Defined constant variables
-const sgRegion = 'asia-southeast1-a'
-const usRegion = 'us-central1-a'
+const sgRegion = 'asia-southeast1'
+const usRegion = 'us-central1'
 
 // Create network and subnet
 const network = new gcp.compute.Network('hadoop-vpc', { autoCreateSubnetworks: false })
@@ -37,25 +37,24 @@ const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-manag
 })
 
 
-const createInstance = (id: number, region: string, network: gcp.compute.Network ,isMaster: boolean = false) => {
+const createInstance = (id: number, region: string, network: gcp.compute.Network, subnet: gcp.compute.Subnetwork ,isMaster: boolean = false) => {
     const name = isMaster ? `hadoop-namenode-${id}` : `hadoop-datanode-${id}`
     return new gcp.compute.Instance(name, {
         zone: region,
         machineType: 'e2-standard-2',
         networkInterfaces: [{
             network: network.id,
-            name: isMaster ? `hadoop-namenode-${id}-nic` : `hadoop-datanode-${id}-nic`,
             accessConfigs: [{}],
-            subnetwork: sgSubnet.id,
+            subnetwork: subnet.id,
         }],
         bootDisk: {
             initializeParams: {
-                image: 'ubuntu-os-cloud/ubuntu-1804-bionic-v20200415',
-                size: 50
+                image: 'projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20211103',
+                size: 20
             }
         },
         tags: isMaster ? ['hadoop-master'] : ['hadoop-datanode'],
     })
 }
 
-const namenodeInstances = [createInstance(1, sgRegion, network, true), createInstance(2, usRegion, network, true)]
+const namenodeInstances = [createInstance(1, `${sgRegion}-a`, network, sgSubnet, true), createInstance(2, `${usRegion}-a`, network, usSubnet,true)]
