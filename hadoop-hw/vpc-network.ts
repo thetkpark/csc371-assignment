@@ -33,3 +33,15 @@ const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-manag
     ],
     targetTags: [...nameNodeNetworkTag]
 })
+
+const iapIngressFirewall = new gcp.compute.Firewall('allow-iap-ingress', {
+    network: network.id,
+    allows: [
+        {
+            protocol: 'tcp',
+            ports: ['22', '3389'],
+        }
+    ],
+    sourceRanges: ['35.235.240.0/20'],
+    direction: 'INGRESS',
+})
