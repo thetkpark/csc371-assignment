@@ -1,17 +1,25 @@
 import * as gcp from "@pulumi/gcp";
-import { usRegion, sgRegion, masterNetworkTag } from './config'
+import { usRegion, sgRegion, nameNodeNetworkTag } from './config'
 
 // Create network and subnet
 export const network = new gcp.compute.Network('hadoop-vpc', { autoCreateSubnetworks: false })
-export const sgSubnet = new gcp.compute.Subnetwork('singapore-subnet', {
-    ipCidrRange: '10.0.1.0/24',
-    network: network.id,
-    region: sgRegion,
-})
-export const usSubnet = new gcp.compute.Subnetwork('america-subnet', {
-    ipCidrRange: '10.0.2.0/24',
-    network: network.id,
-    region: usRegion,
+
+// Create subnets in Singapore, Iowa, Netherlands, Toronto, Mumbai
+const location = ['singapore', 'iowa', 'netherlands', 'toronto', 'mumbai']
+export const subnets = ['asia-southeast1', 'us-central1', 'europe-west4', 'northamerica-northeast2', 'asia-south1'].map((region, i) => {
+    const zone = region + '-a'
+    const subnet = new gcp.compute.Subnetwork(region + '-subnet', {
+        ipCidrRange: `10.0.${i+1}.0/24`,
+        network: network.id,
+        region: region
+    })
+    return {
+        zone, 
+        region,
+        subnet,
+        location: location[i],
+        perferedIp: `10.0.${i+1}.5`,
+    }
 })
 
 // Create firewall rule
@@ -23,5 +31,5 @@ const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-manag
             ports: ['9870'],
         }
     ],
-    targetTags: [...masterNetworkTag]
+    targetTags: [...nameNodeNetworkTag]
 })

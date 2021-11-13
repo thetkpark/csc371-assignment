@@ -1,42 +1,34 @@
 import * as pulumi from "@pulumi/pulumi"
 import * as gcp from "@pulumi/gcp"
 import { readFileSync } from "fs"
-import { network, sgSubnet, usSubnet } from "./vpc-network"
+import { network, subnets } from "./vpc-network"
 import {
 	machineType,
-	masterNetworkTag,
-	workerNetworkTag,
-	sgRegion,
-	usRegion,
-	usZone,
-	sgZone
+	nameNodeNetworkTag,
+	dataNodeNetworkTag,
 } from "./config"
 
 const startupScript = readFileSync("./startup.sh", 'utf-8')
-// const startupScript = `#!/bin/bash
-// sudo apt-get update && sudo apt-get -y dist-upgrade
-// sudo apt-get -y install openjdk-8-jdk-headless
-// mkdir hadoop-install && cd hadoop-install
-// wget https://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-3.3.1/hadoop-3.3.1-aarch64.tar.gz
-// tar xvzf hadoop-3.3.1-aarch64.tar.gz`
 
 const createInstance = (
 	id: number,
-	region: string,
 	network: gcp.compute.Network,
 	subnet: gcp.compute.Subnetwork,
-	isMaster: boolean = false
+	zone: string,
+	location: string,
+	privateIp: string,
+	isNamenode: boolean = false
 ) => {
-	const name = isMaster ? `hadoop-namenode-${id}` : `hadoop-datanode-${id}`
+	const name = (isNamenode ? `hadoop-${id}-namenode` : `hadoop-${id}-datanode`) + `-${location}`
 	return new gcp.compute.Instance(name, {
-		zone: region,
+		zone,
 		machineType,
 		networkInterfaces: [
 			{
 				network: network.id,
 				accessConfigs: [{}],
 				subnetwork: subnet.id,
-				networkIp: ''
+				networkIp: privateIp
 			}
 		],
 		bootDisk: {
@@ -46,13 +38,11 @@ const createInstance = (
 				size: 20
 			}
 		},
-		tags: isMaster ? [...masterNetworkTag] : [...workerNetworkTag],
+		tags: [...dataNodeNetworkTag].concat(isNamenode ? nameNodeNetworkTag : []),
 		metadataStartupScript: startupScript
 	})
 }
 
-const namenodeInstances = [
-	createInstance(1, sgZone, network, sgSubnet, true),
-	createInstance(2, usZone, network, usSubnet, true)
-]
-
+const instances = subnets.map((subnet, i) => {
+	createInstance(i+1, network, subnet.subnet, subnet.zone, subnet.location, subnet.perferedIp, i < 2)
+})
