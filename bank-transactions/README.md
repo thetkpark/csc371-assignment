@@ -67,7 +67,9 @@ First, we transform the input data source into stream by using `.stream()` and `
 
 ## Task 2
 
+#### Task 2.1
 
+First, we transform the input data source into stream by using `.stream()` and `.parallelStream()`. Then, we used `.collect(Collectors.groupingBy(Transaction::getMonthYear))` to group the transactions by month and year (transactions in the group will be transaction in the same month and year). After that, we use `.forEach()` to iterate all group of transactions. After that, we calculate the balance of transaction in the group by tranform ArrayList of Transaction to be stream by using `.stream()` and `parallelStream()`. Then use `.map()` to calculate the balance in that transation (deposit - withdrawl). Then we reduce it to be the balance by using `.reduce(0f, Float::sum)`. In the end, we print out the balance in that month to the console.
 
 ### Result of Task 2.1
 
@@ -77,11 +79,15 @@ First, we transform the input data source into stream by using `.stream()` and `
 > Large Task 2.1: Serial 2453.11 ms, Parallel 1093.76 ms
 > Speedup: 2.24	Efficiency: 0.56
 
+#### Task 2.2
+
+This task is similar to task2.1, but in order to calculate the balance we need to use the balance from the given csv file. That means we need to extract the first balance of that month. After we create the stream and group by month and year and iterate all group by using `.forEach()`, we use `.get(0)` to retreive the first transaction. After that the initial balance will be balance of first transaction + withdrawl of first transaction - deposit of first transaction (since balance in this row is balance after including withdrawl and deposit). After that we use `.map()` and `.reduce()` to calculate the balance in that month. In the end, we print out the balance in that month to the console.
+
 ### Result of Task 2.2
 
-> Task 2.2: Serial 15.62 ms, Parallel 15.62 ms
-> Speedup: 1.0	Efficiency: 0.25
->
+Task 2.2: Serial 15.62 ms, Parallel 15.62 ms
+Speedup: 1.0	Efficiency: 0.25
+
 > Large Task 2.2: Serial 2000.05 ms, Parallel 1078.12 ms
 > Speedup: 1.86	Efficiency: 0.47
 
