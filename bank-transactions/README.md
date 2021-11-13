@@ -87,3 +87,10 @@ First, we transform the input data source into stream by using `.stream()` and `
 
 ## Conclusion
 
+From the result of running tasks 1 and 2, we can clearly see the difference in speedup and efficiency between the two sizes of the dataset for using parallel stream. The speedup and efficiency increase when we change data from 5,000 records to 5,000,000 records. It follows the NQ model such that the larger the product of N (number of data) * Q (Amount of operation per element), the more likely that we will benefit from parallel computing. Therefore, increasing out N or number of data from 5,000 to 5,000,000 made the problem large enough to overcome the overhead cost of parallel computing.
+
+# Team Members
+
+- 62130500209 Thanakorn Aungunchuchod
+- 62130500212 Thanaphon Sombunkaeo
+- 62130500230 Sethanant Pipatpakorn
