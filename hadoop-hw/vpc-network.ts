@@ -45,3 +45,22 @@ const iapIngressFirewall = new gcp.compute.Firewall('allow-iap-ingress', {
     sourceRanges: ['35.235.240.0/20'],
     direction: 'INGRESS',
 })
+
+const allowInternal = new gcp.compute.Firewall('allow-internal-traffic', {
+    network: network.id,
+    allows: [
+        {
+            protocol: 'tcp',
+            ports: ['0-65535'],
+        },
+        {
+            protocol: 'udp',
+            ports: ['0-65535'],
+        },
+        {
+            protocol: 'icmp',
+        },
+    ],
+    sourceRanges: ['10.0.0.0/8'],
+    direction: 'INGRESS',
+})
