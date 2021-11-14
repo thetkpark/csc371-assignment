@@ -28,7 +28,7 @@ const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-manag
     allows: [
         {
             protocol: 'tcp',
-            ports: ['9870'],
+            ports: ['9870', '8088', '19888'],
         }
     ],
     targetTags: [...nameNodeNetworkTag]
