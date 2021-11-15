@@ -23,13 +23,12 @@ export const subnets = ['asia-southeast1', 'us-central1', 'europe-west4', 'north
 })
 
 // Create firewall rule 
-// '8088', '19888'
 const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-management-port', {
     network: network.id,
     allows: [
         {
             protocol: 'tcp',
-            ports: ['9870'],
+            ports: ['9870', '8088', '19888'],
         }
     ],
     targetTags: [...nameNodeNetworkTag]
@@ -39,7 +38,7 @@ const hadoopDatanodeFirewall = new gcp.compute.Firewall('allow-hadoop-datanode-p
     allows: [
         {
             protocol: 'tcp',
-            ports: ['80'],
+            ports: ['80', '8080'],
         }
     ],
     targetTags: [...dataNodeNetworkTag]
