@@ -1,5 +1,5 @@
 import * as gcp from "@pulumi/gcp";
-import { usRegion, sgRegion, nameNodeNetworkTag } from './config'
+import { usRegion, sgRegion, nameNodeNetworkTag, dataNodeNetworkTag } from './config'
 
 // Create network and subnet
 export const network = new gcp.compute.Network('hadoop-vpc', { autoCreateSubnetworks: false })
@@ -22,16 +22,27 @@ export const subnets = ['asia-southeast1', 'us-central1', 'europe-west4', 'north
     }
 })
 
-// Create firewall rule
+// Create firewall rule 
+// '8088', '19888'
 const hadoopMasterFirewall = new gcp.compute.Firewall('allow-hadoop-master-management-port', {
     network: network.id,
     allows: [
         {
             protocol: 'tcp',
-            ports: ['9870', '8088', '19888'],
+            ports: ['9870'],
         }
     ],
     targetTags: [...nameNodeNetworkTag]
+})
+const hadoopDatanodeFirewall = new gcp.compute.Firewall('allow-hadoop-datanode-port', {
+    network: network.id,
+    allows: [
+        {
+            protocol: 'tcp',
+            ports: ['80'],
+        }
+    ],
+    targetTags: [...dataNodeNetworkTag]
 })
 
 const iapIngressFirewall = new gcp.compute.Firewall('allow-iap-ingress', {
