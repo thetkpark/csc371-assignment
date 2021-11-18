@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.opencsv.CSVReader;
 import org.apache.hadoop.conf.Configuration;
