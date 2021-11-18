@@ -48,7 +48,7 @@ public class Main {
 
             float balance = txsList[0].getBalance() + txsList[1].sumDepositWithdrawl();
             if (Math.abs(balance - txsList[1].getBalance()) > 0.001) {
-                context.write(key, txsList[0].toString());
+                context.write(key, txsList[1].toString());
             }
         }
     }
@@ -71,7 +71,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "word count");
+        Job job = Job.getInstance(conf, "find error balance");
         job.setJarByClass(Main.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(SumSamePairReducer.class);
