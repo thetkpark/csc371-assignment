@@ -36,11 +36,10 @@ public class Main {
 //            Transaction[] txs = new Transaction[2];
 //            int i = 0;
 
-            String output = "";
+//            String output = "";
             for (Text text : textTxs) {
-//                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                context.write(key, text);
-//                output = token[4];
+                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                context.write(key, new Text(token[4]));
             }
 //            Transaction[] txsList = new Transaction[2];
 //            int i = 0;
