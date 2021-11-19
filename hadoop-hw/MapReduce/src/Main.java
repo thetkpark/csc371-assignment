@@ -39,7 +39,10 @@ public class Main {
 //            String output = "";
             for (Text text : textTxs) {
                 String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                context.write(key, new Text(token[4]));
+                if (token.length < 5) {
+                    context.write(key, text);
+                }
+//                context.write(key, new Text(token.length + ""));
             }
 //            Transaction[] txsList = new Transaction[2];
 //            int i = 0;
