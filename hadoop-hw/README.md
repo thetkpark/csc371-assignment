@@ -42,6 +42,10 @@
 
 6. Create `hadoop` user in each vm
 
+6. Create new direcotry for storing files in HDFS with `sudo mkdir -p /usr/local/hadoop/hdfs/data`
+
+6. Change ownership to the `hadoop` user using `sudo chown -R hadoop:hadoop /usr/local/hadoop/hdfs/data`
+
 7. Download the binary of Hadop 3.3.1 and extract the archive.
 
 8. Update `etc/hadoop/hadoop-env.sh` on all nodes to export the necessary environment variable
@@ -157,8 +161,11 @@
     10.0.1.5
     ```
 
-16. Generate private key and public key on each node with `ssh-keygen` command
-17. Copy the public key of primary namenode to `~/.ssh/authorized_keys` on every nodes.
-18. Use the script `sbin/start-all.sh` to start the Hadoop cluster.
-19. Create input and output directory on HDFS with command `./bin/hadoop fs -mkdir input` and `./bin/hadoop fs -mkdir output`
+18. Generate private key and public key on each node with `ssh-keygen` command
+
+19. Copy the public key of primary namenode to `~/.ssh/authorized_keys` on every nodes.
+
+20. Format the HDFS with `sudo ./bin/hdfs namenode -format`
+
+21. Use the script `sbin/start-all.sh` to start the Hadoop cluster.
 
