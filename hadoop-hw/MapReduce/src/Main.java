@@ -1,9 +1,6 @@
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
-import com.opencsv.CSVReader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -21,19 +18,16 @@ public class Main {
         private String uuid = UUID.randomUUID().toString();
         private boolean pair = true;
 
-        public void map(Object key, Text value, Context context) {
-            CSVReader reader = new CSVReader(new StringReader(value.toString()));
-            try {
-                Transaction tx = new Transaction(reader.readNext());
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String[] cols = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            Transaction tx = new Transaction(cols);
+
+            context.write(new Text(uuid), tx);
+            if (!pair) {
+                uuid = UUID.randomUUID().toString();
                 context.write(new Text(uuid), tx);
-                if (!pair) {
-                    uuid = UUID.randomUUID().toString();
-                    context.write(new Text(uuid), tx);
-                }
-                pair = !pair;
-            } catch (Exception e) {
-                System.out.println(e.toString());
             }
+            pair = !pair;
         }
     }
 
@@ -81,4 +75,5 @@ public class Main {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
+    
 }
