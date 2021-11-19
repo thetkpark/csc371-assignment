@@ -6,6 +6,7 @@ import {
 	machineType,
 	nameNodeNetworkTag,
 	dataNodeNetworkTag,
+	project,
 } from "./config"
 
 const startupScript = readFileSync("./startup.sh", 'utf-8')
@@ -39,7 +40,8 @@ const createInstance = (
 			}
 		},
 		tags: [...dataNodeNetworkTag].concat(isNamenode ? nameNodeNetworkTag : []),
-		metadataStartupScript: startupScript
+		metadataStartupScript: startupScript,
+		project,
 	})
 }
 

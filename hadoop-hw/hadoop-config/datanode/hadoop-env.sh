@@ -4,6 +4,7 @@ export HDFS_DATANODE_USER="hadoop"
 export HDFS_SECONDARYNAMENODE_USER="hadoop"
 export YARN_RESOURCEMANAGER_USER="hadoop"
 export YARN_NODEMANAGER_USER="hadoop"
+export HADOOP_HOME=/home/hadoop/hadoop-3.3.1
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
