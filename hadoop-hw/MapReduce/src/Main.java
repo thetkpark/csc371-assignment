@@ -44,6 +44,8 @@ public class Main {
                     return;
                 } else {
                     txs[i] = new Transaction(token);
+                    context.write(key, new Text(txs[i].toString()));
+                    i++;
                 }
 //                context.write(key, new Text(token.length + ""));
             }
@@ -52,12 +54,11 @@ public class Main {
 //            for (Transaction tx : txs) {
 //                txsList[i] = tx;
 //            }
-
 //
-            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
-            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
-                context.write(key, new Text(txs[1].toString()));
-            }
+//            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
+//            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
+//                context.write(key, new Text(txs[1].toString()));
+//            }
         }
     }
 
