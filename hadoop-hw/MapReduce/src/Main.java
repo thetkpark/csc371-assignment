@@ -41,15 +41,16 @@ public class Main {
 
             for (Text text : textTxs) {
                 String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                if (token.length < 5) {
-                    return;
-                } else {
-                    deposit[i] = Float.parseFloat(token[2].replace("\"", "").replace(",", ""));
-                    withdrawl[i] = Float.parseFloat(token[3].replace("\"", "").replace(",", ""));
-                    balances[i] = Float.parseFloat(token[4].replace("\"", "").replace(",", ""));
-                    i++;
-                    context.write(key, text);
-                }
+                context.write(key, new Text(text.toString() + " #" + token.length));
+//                if (token.length < 5) {
+//                    return;
+//                } else {
+//                    deposit[i] = Float.parseFloat(token[2].replace("\"", "").replace(",", ""));
+//                    withdrawl[i] = Float.parseFloat(token[3].replace("\"", "").replace(",", ""));
+//                    balances[i] = Float.parseFloat(token[4].replace("\"", "").replace(",", ""));
+//                    i++;
+//                    context.write(key, text);
+//                }
             }
 //            Transaction[] txsList = new Transaction[2];
 //            int i = 0;
