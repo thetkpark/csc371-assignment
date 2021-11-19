@@ -33,14 +33,17 @@ public class Main {
 
     public static class SumSamePairReducer extends Reducer<Text, Text, Text, Text> {
         public void reduce(Text key, Iterable<Text> textTxs, Context context) throws IOException, InterruptedException {
-//            Transaction[] txs = new Transaction[2];
-//            int i = 0;
+            Transaction[] txs = new Transaction[2];
+            int i = 0;
 
 //            String output = "";
             for (Text text : textTxs) {
                 String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (token.length < 5) {
-                    context.write(key, text);
+//                    context.write(key, text);
+                    return;
+                } else {
+                    txs[i] = new Transaction(token);
                 }
 //                context.write(key, new Text(token.length + ""));
             }
@@ -51,10 +54,10 @@ public class Main {
 //            }
 
 //
-//            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
-//            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
-//                context.write(key, new Text(txs[1].toString()));
-//            }
+            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
+            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
+                context.write(key, new Text(txs[1].toString()));
+            }
         }
     }
 
