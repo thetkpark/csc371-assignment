@@ -38,15 +38,15 @@
 
 4. Run the Pulumi CLI to let it create the resources on desired GCP project.
 
-5. SSH into each of the virtual machine to install JDK version 8.
+5. SSH into each of the virtual machines to install JDK version 8.
 
 6. Create `hadoop` user in each vm
 
-6. Create new direcotry for storing files in HDFS with `sudo mkdir -p /usr/local/hadoop/hdfs/data`
+6. Create new direcotry for storing files in HDFS with `sudo mkdir -p /usr/local/hadoop/hdfs/data` in every VM.
 
 6. Change ownership to the `hadoop` user using `sudo chown -R hadoop:hadoop /usr/local/hadoop/hdfs/data`
 
-7. Download the binary of Hadop 3.3.1 and extract the archive.
+7. Download the binary of Hadop 3.3.1 and extract the archive in each VM.
 
 8. Update `etc/hadoop/hadoop-env.sh` on all nodes to export the necessary environment variable
 
