@@ -38,15 +38,16 @@ public class Main {
 
             String output = "";
             for (Text text : textTxs) {
-                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                output = token[4];
+//                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                context.write(key, text);
+//                output = token[4];
             }
 //            Transaction[] txsList = new Transaction[2];
 //            int i = 0;
 //            for (Transaction tx : txs) {
 //                txsList[i] = tx;
 //            }
-            context.write(key, new Text(output));
+
 //
 //            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
 //            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
