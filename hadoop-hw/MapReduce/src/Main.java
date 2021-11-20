@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -15,7 +14,6 @@ public class Main {
     public static class TokenizerMapper
             extends Mapper<Object, Text, Text, Text>{
 
-//        private String uuid = UUID.randomUUID().toString();
         private Transaction tx = null;
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -25,31 +23,22 @@ public class Main {
                 float calculatedBalance = tx.getBalance() + currentTx.sumDepositWithdrawl();
 
                 if (Math.abs(calculatedBalance - currentTx.getBalance()) > 0.001) {
-                    context.write(new Text(), new Text("Actual balance: " + calculatedBalance + ", Balance: " + currentTx.getBalance()));
+                    String val = currentTx.getDate().toString() + " Actual balance: " + calculatedBalance + ", Balance: " + currentTx.getBalance();
+                    context.write(new Text("1"), new Text(val));
                 }
             }
             tx = new Transaction(tokens);
         }
     }
 
-//    public static class SumSamePairReducer extends Reducer<Text, Text, Text, Text> {
-//        public void reduce(Text key, Iterable<Text> textTxs, Context context) throws IOException, InterruptedException {
-//
-//            Transaction[] txs = new Transaction[2];
-//            int i = 0;
-//
-//            for (Text text : textTxs) {
-//                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-//                txs[i] = new Transaction(token);
-//                i++;
-//            }
-//
-//            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
-//            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
-//                context.write(key, new Text(txs[1].toString()));
-//            }
-//        }
-//    }
+    public static class AggregationReducer extends Reducer<Text, Text, Text, Text> {
+        public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            Text emptyText = new Text();
+            for (Text val : values) {
+                context.write(emptyText, val);
+            }
+        }
+    }
 
 
 
@@ -58,9 +47,9 @@ public class Main {
         Job job = Job.getInstance(conf, "find error balance");
         job.setJarByClass(Main.class);
         job.setMapperClass(TokenizerMapper.class);
-        job.setNumReduceTasks(0);
-//        job.setCombinerClass(SumSamePairReducer.class);
-//        job.setReducerClass(SumSamePairReducer.class);
+        job.setNumReduceTasks(1);
+        job.setCombinerClass(AggregationReducer.class);
+        job.setReducerClass(AggregationReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
