@@ -36,15 +36,15 @@
 
 3. Write the code in TypeScript to create VPC Network, subnets, firewall rules, and 5 virtual machine with fixed internal IP address.
 
-4. Run the Pulumi CLI to let it create the resources on desired GCP project.
+4. Run the Pulumi CLI to let it create the defined resources on desired GCP project.
 
 5. SSH into each of the virtual machines to install JDK version 8.
 
 6. Create `hadoop` user in each vm
 
-6. Create new direcotry for storing files in HDFS with `sudo mkdir -p /usr/local/hadoop/hdfs/data` in every VM.
+6. Create new directory for storing files in HDFS with `sudo mkdir -p /usr/local/hadoop/hdfs/data` in every VM.
 
-6. Change ownership to the `hadoop` user using `sudo chown -R hadoop:hadoop /usr/local/hadoop/hdfs/data`
+6. Change ownership of the directory to `hadoop` user using `sudo chown -R hadoop:hadoop /usr/local/hadoop/hdfs/data`
 
 7. Download the binary of Hadop 3.3.1 and extract the archive in each VM.
 
@@ -95,7 +95,7 @@
     </property>
     ```
 
-12. Update `etc/hadoop/cat mapred-site.xml` on all primary namenode 
+12. Update `etc/hadoop/cat mapred-site.xml` on primary namenode 
 
     ```xml
     <configuration>
@@ -165,7 +165,13 @@
 
 19. Copy the public key of primary namenode to `~/.ssh/authorized_keys` on every nodes.
 
-20. Format the HDFS with `sudo ./bin/hdfs namenode -format`
+20. Format the HDFS on primary namenode with `sudo ./bin/hdfs namenode -format`
 
 21. Use the script `sbin/start-all.sh` to start the Hadoop cluster.
+
+## How the program works
+
+​	Our program is composed of a Mapper and a Reducer. The Mapper class is responsible for parsing the data and checking for the balance error. Since the input to the Mapper is a line of Text, it must be split using the regular expression and used to create a Transaction object. The first balance of each Mapper is assumed as correct. Thus, we don't have to check it but store it in the local variable for checking the next Transaction. First, the incoming input is parsed to the Transaction object. Then, the summation of the previous balance, a deposit of current Transaction, and withdrawal of current Transaction is calculated. If the summation and the current balance have a difference of more than 0.001, the current Transaction is written to the output with the key of "1". It indicates that the current Transaction has an error balance. After that, the local Transaction is replaced by the current Transaction and the loop continues.
+
+​	The Reducer, only responsible for combining the result from each Mapper into a single file. Because each output from the Mapper has the key of "1". Therefore, there is only one Reducer needed for this task. The output from Reducer is written to HDFS and the MapReduce task is done.
 
