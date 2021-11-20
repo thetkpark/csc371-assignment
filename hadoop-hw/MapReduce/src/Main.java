@@ -15,55 +15,56 @@ public class Main {
     public static class TokenizerMapper
             extends Mapper<Object, Text, Text, Text>{
 
-        private String uuid = UUID.randomUUID().toString();
+//        private String uuid = UUID.randomUUID().toString();
         private boolean pair = true;
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-//            String[] cols = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-//            Transaction tx = new Transaction(cols);
+            String[] cols = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            Transaction tx = new Transaction(cols);
+            context.write(new Text(), new Text(tx.toString()));
 
-            context.write(new Text(uuid), value);
-            if (!pair) {
-                uuid = UUID.randomUUID().toString();
-                context.write(new Text(uuid), value);
-            }
-            pair = !pair;
+//            context.write(new Text(uuid), value);
+//            if (!pair) {
+//                uuid = UUID.randomUUID().toString();
+//                context.write(new Text(uuid), value);
+//            }
+//            pair = !pair;
         }
     }
 
-    public static class SumSamePairReducer extends Reducer<Text, Text, Text, Text> {
-        public void reduce(Text key, Iterable<Text> textTxs, Context context) throws IOException, InterruptedException {
-
-            float[] balances = new float[2];
-            float[] deposit = new float[2];
-            float[] withdrawl = new float[2];
-            int i = 0;
-
-            for (Text text : textTxs) {
-                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                context.write(key, new Text(text.toString() + " #" + token.length));
-//                if (token.length < 5) {
-//                    return;
-//                } else {
-//                    deposit[i] = Float.parseFloat(token[2].replace("\"", "").replace(",", ""));
-//                    withdrawl[i] = Float.parseFloat(token[3].replace("\"", "").replace(",", ""));
-//                    balances[i] = Float.parseFloat(token[4].replace("\"", "").replace(",", ""));
-//                    i++;
-//                    context.write(key, text);
-//                }
-            }
-//            Transaction[] txsList = new Transaction[2];
-//            int i = 0;
-//            for (Transaction tx : txs) {
-//                txsList[i] = tx;
-//            }
+//    public static class SumSamePairReducer extends Reducer<Text, Text, Text, Text> {
+//        public void reduce(Text key, Iterable<Text> textTxs, Context context) throws IOException, InterruptedException {
 //
-//            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
-//            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
-//                context.write(key, new Text(txs[1].toString()));
+//            float[] balances = new float[2];
+//            float[] deposit = new float[2];
+//            float[] withdrawl = new float[2];
+//            int i = 0;
+//
+//            for (Text text : textTxs) {
+//                String[] token = text.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+//                context.write(key, new Text(text.toString() + " #" + token.length));
+////                if (token.length < 5) {
+////                    return;
+////                } else {
+////                    deposit[i] = Float.parseFloat(token[2].replace("\"", "").replace(",", ""));
+////                    withdrawl[i] = Float.parseFloat(token[3].replace("\"", "").replace(",", ""));
+////                    balances[i] = Float.parseFloat(token[4].replace("\"", "").replace(",", ""));
+////                    i++;
+////                    context.write(key, text);
+////                }
 //            }
-        }
-    }
+////            Transaction[] txsList = new Transaction[2];
+////            int i = 0;
+////            for (Transaction tx : txs) {
+////                txsList[i] = tx;
+////            }
+////
+////            float calculatedBalance = txs[0].getBalance() + txs[1].sumDepositWithdrawl();
+////            if (Math.abs(calculatedBalance - txs[1].getBalance()) > 0.001) {
+////                context.write(key, new Text(txs[1].toString()));
+////            }
+//        }
+//    }
 
 
 //    public static class Transaction {
@@ -105,8 +106,9 @@ public class Main {
         Job job = Job.getInstance(conf, "find error balance");
         job.setJarByClass(Main.class);
         job.setMapperClass(TokenizerMapper.class);
-        job.setCombinerClass(SumSamePairReducer.class);
-        job.setReducerClass(SumSamePairReducer.class);
+        job.setNumReduceTasks(0);
+//        job.setCombinerClass(SumSamePairReducer.class);
+//        job.setReducerClass(SumSamePairReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
